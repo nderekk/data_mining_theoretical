@@ -1,0 +1,548 @@
+\documentclass[a4paper,12pt]{article}
+
+% Packages
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,     % Internal links (like Table of Contents)
+    citecolor=blue,      % Citations
+    urlcolor=cyan        % External URLs
+}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{titlesec}  % For title formatting
+\geometry{margin=1in}
+\setstretch{1.5}
+\usepackage{listings}
+%font greek
+\usepackage[utf8]{inputenc}
+\usepackage[greek,english]{babel}
+\usepackage{alphabeta}
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\usepackage{minted}
+\usepackage[round]{natbib} % For (Devlin et al., 2019)
+
+%Coding
+\usepackage{xcolor,listings}
+\usepackage{textcomp}
+\lstset{upquote=true}
+\usepackage{courier} %% Sets font for listing as Courier.
+\lstset{
+showstringspaces = false, %% prevent space marking in strings, string is defined as the text that is generally printed directly to the console
+numbers = left, %% display line numbers on the left
+commentstyle = \color{green}, %% set comment color
+keywordstyle = \color{blue}, %% set keyword color
+stringstyle = \color{black}, %% set string color
+rulecolor = \color{black}, %% set frame color to avoid being affected by text color
+basicstyle = \small \ttfamily , %% set listing font and size
+breaklines = true, %% enable line breaking
+numberstyle = \tiny,
+}
+
+% Title Formatting
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+\include{titlepage}
+\newpage
+
+\tableofcontents
+
+
+\clearpage
+\section{Introduction}
+This report focuses on the study of the Bert Transformer architecture for deep language understanding. After a short description of the state of NLP around the time when Transformers came along and revolutionized the field, we will continue with a brief overview behind the novel idea of the original Transformer that led to it's inception \citep{vaswani2017attention} and then summarize the original paper \citep{devlin2019bert} and its influence. 
+
+To facilitate the main objective of this report, we will further our focus on a number of \textit{State-Of-The-Art} (SOTA) implementations utilizing the BERT Transformer, their different approaches, and philosophies, as well as *i II or III that doume vaggo*.
+
+\section{The State of NLP in 2017}
+Prior to the introduction of the Transformer architecture, the prevailing paradigm in NLP relied almost exclusively on seq2seq models rooted in Recurrent Neural Networks (RNNs). While architectures such as LSTMs \citep{hochreiter1997long} and GRUs were designed to mitigate the vanishing gradient problem, several fundamental bottlenecks persisted.
+
+\subsection{Sequential Processing and Parallelization}
+The defining characteristic of RNNs is their sequential nature; they process tokens one by one, maintaining a hidden state $h_t$ that is dependent on the previous state $h_{t-1}$. This linear dependency creates a significant computational bottleneck, as it prevents parallelization during training. As datasets grew in the mid-2010s, the inability to leverage GPU hardware to its full extent became a primary constraint on model scaling.
+
+\subsection{The Long-Range Dependency Problem}
+Despite the memory gates in LSTMs, these models struggled to capture dependencies between words that were far apart in a sentence. The signal of a word at the beginning of a long sequence often became diluted by the time the model reached the end. This was largely a consequence of the \textit{representation bottleneck}, where the model attempted to compress the semantic information of an entire variable-length input sequence into a single fixed-length context vector. While early attention mechanisms \citep{bahdanau2014neural} were introduced to allow the decoder to "look back" at specific encoder states, they were still auxiliary components added onto an underlying recurrent structure.
+
+\subsection{Static vs. Contextual Embeddings}
+In 2017, the industry standard for word representation involved static embeddings such as Word2Vec or GloVe. These methods assigned a single fixed vector to each word (e.g., the word "bank" would have the same vector regardless of whether the context was financial or geographical). While contemporaneous models like ELMo began experimenting with context-sensitive representations using Bi-LSTMs, the field was ripe for a non-recurrent architecture that could process entire sequences bi-directionally and simultaneously.
+
+This vacuum set the stage for the "Attention is All You Need" paper, which proposed a radical departure: discarding recurrence entirely in favor of the Self-Attention mechanism.
+
+\section{The Transformer Revolution}
+In 2017, Vaswani et al. published "Attention Is All You Need", proposing an architecture that discarded recurrence and convolution entirely in favor of a mechanism known as \textit{Self-Attention}. This shift allowed for unprecedented parallelization and solved the long-range dependency issues that had plagued the field.
+
+\subsection{The Core Architecture}
+The original Transformer was built to solve Machine Translation. That is, for a given text sequence as input, for example in French (\textit{Je suis etudiant}), for the model to output its English translation (\textit{I am a student}), or any other language for that matter. Its architecture consisted of two parts. An encoder stack and a decoder stack.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{img/transformer_architecture_high.png}
+    \caption{High level view of the Transformer architecture}
+    \label{fig:placeholder}
+\end{figure}
+ 
+In the original paper, the encoder stack consisted of six identical encoders, stacked on top of each other. It should be noted that there is nothing inherently special about the number six, any different number of arrangements is possible. The decoder stack also stacks six decoders on top of each other.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{img/xray_encoder.png}
+    \caption{Inter structure of Encoder and Decoder modules}
+    \label{fig:placeholder}
+\end{figure}
+
+The encoders are all identical in structure. They consist of two layers. The first layer is the so called \textit{Self-Attention} layer, and the second layer is a simple feed forward network. Both layers are wrapped in a residual connection and followed by layer normalization.
+
+The decoder modules are also identical in structure, and they consist of three layers. The first layer is a masked self-attention layer, the second layer is a regular attention layer that attends to the output of the encoder stack, and the third layer is a feed forward network. Similar to the encoder, all three layers are wrapped in residual connections and followed by layer normalization.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{img/enc_dec_layers.png}
+    \caption{Module Internal Structure}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsubsection{Self-Attention}
+The self-attention mechanism is at the core of the transformer and the main reason for its success. Past architectures had to rely on recurrence to capture the dependencies between tokens in a sequence. The self-attention mechanism allows the model to directly attend to all positions in the input sequence simultaneously, regardless of their distance from each other. This is achieved by computing attention weights that determine how much each token should attend to every other token in the sequence when generating its representation.
+
+The \textbf{first step} in calculating self-attention is to create three vectors from each of the encoder's input vectors, which at the beginning step are just the static embedding of each word (positional encodings are also added to the input embeddings to inject information about the position of each token in the sequence). These three vectors are the Query ($Q$), Key ($K$), and Value ($V$) vectors. Each of these is obtained by multiplying the input embedding by a learned weight matrix ($W^Q$, $W^K$, $W^V$). 
+
+The \textbf{second step} is to compute a score for each token in the sequence. Let's imagine the input sentence "Blue Cheese" and let's assume it consists of the tokens "Blue" and "Cheese". When calculating the self-attention score for the token "Blue", we need to score each other token in the sequence against this token. The score determines how much attention the current token should pay to the rest of the tokens in the sequence, in order to create its representation. 
+
+The score is computed by taking the dot product of target token's query vector against the key vector of the token we are scoring against. In our example, to calculate the score of "Blue", we would take the dot product of the query vector of "Blue" first against itself, and then against the token "Cheese". That is, $q_1 \cdot k_1$, and $q_1 \cdot k_2$ respectively. 
+
+The \textbf{third step} is to scale the scores by $\frac{1}{\sqrt{d_k}}$, where $d_k$ is the dimension of the keys. This scaling step is a critical "safety valve" for gradients. Without it, for large values of $d_k$, the dot products could grow extremely large in magnitude, pushing the softmax function into regions where its gradient is extremely small, leading to the vanishing gradient problem during backpropagation.
+
+The \textbf{fourth step} is to  apply a softmax function to obtain the attention weights. In the above example, if $\frac{q_1 \cdot k_1}{\sqrt{d_k}}=112$, and $\frac{q_1 \cdot k_2}{\sqrt{d_k}}=96$, the softmax would give the scores $0.88$ and $0.12$ respectively. This means that the token "Blue" would attend to itself with a weight of $0.88$ and to "Cheese" with a weight of $0.12$. 
+
+The \textbf{fifth step} is to multiply each token's value vector by the corresponding softmax score and then sum the weighted value vectors to obtain the output of the self-attention layer for the target token. In our example, the output for "Blue" would be $0.88 \cdot  + 0.12 \cdot v_2$.
+
+In the actual implementation, the above happen in matrix form, so we'll shortly describe that as well. 
+
+\textbf{First,} we pack all of our input embeddings into one matrix $X$, and then take the dot product of $X$ with $W^Q$, $W^K$, and $W^V$ to obtain the $Q$, $K$, and $V$ matrices respectively. So, $Q = XW^Q$, $K = XW^K$, and $V = XW^V$. 
+
+Finally, steps two to five can be described as follows:
+\begin{equation}
+    Z = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+The following steps repeat the process until a special symbol is reached indicating the transformer decoder has completed its output. The output of each step is fed to the bottom decoder in the next time step, and the decoders bubble up their decoding results just like the encoders did. And just like we did with the encoder inputs, we embed and add positional encoding to those decoder inputs to indicate the position of each word.
+Where $Z$ is the output of the self-attention layer. Each row of $Z$ corresponds to the new representation of each token in the input sequence, which is a weighted sum of the value vectors of all tokens, where the weights are determined by the attention scores.
+
+\subsubsection{Multi-Headed Attention}
+The process described above is called "Scaled Dot-Product Attention". The Transformer architecture extends this to "Multi-Head Attention" by having multiple sets of $Q$, $K$, and $V$ matrices, allowing the model to attend to information from different representation subspaces at different positions. Each head performs the attention operation in parallel, and their outputs are concatenated and multiplied with a weight matrix $W^O$ to produce the final output of the multi-head attention layer ($Z$).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/Wo.png}
+    \label{fig:placeholder}
+\end{figure}
+
+Here is the whole multi-head attention process visually:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/multihead.png}
+    \label{fig:placeholder}
+\end{figure}
+
+The output is then fed to the FFNN layer, which consists of two linear transformations with a ReLU activation in between. The FFNN is applied to each position separately and identically, meaning that it does not share parameters across different positions in the sequence.
+
+\subsubsection{The Decoder}
+The decoder uses the same architecture as the encoder, but with an additional attention layer that attends to the output of the encoder stack, called the "encoder-decoder attention" layer. 
+
+The encoder stack part is responsible for generating a bidirectionally contextualized embedding matrix of the input sequence, the $K$ and $V$ matrices. These are to be used by each decoder in its “encoder-decoder attention” layer which helps the decoder focus on appropriate places in the input sequence.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/encdev_attention.png}
+    \label{fig:placeholder}
+\end{figure}
+
+The following steps repeat the process until a special symbol is reached indicating the transformer decoder has completed its output. The output of each step is fed to the bottom decoder in the next time step, and the decoders bubble up their decoding results just like the encoders did. And just like we did with the encoder inputs, we embed and add positional encoding to those decoder inputs to indicate the position of each word.
+
+In the decoder, the self-attention layer is only allowed to attend to earlier positions in the output sequence. This is done by masking future positions (setting them to -inf) before the softmax step in the self-attention calculation.
+
+The “Encoder-Decoder Attention” layer works just like multiheaded self-attention, except it creates its Queries matrix from the layer below it, and takes the Keys and Values matrix from the output of the encoder stack.
+
+\subsection{The intuition behind Self-Attention}
+The self-attention mechanism allows the model to weigh the importance of different tokens in the input sequence when generating a representation for each token. 
+When studying the paper, we found the simple use of the $Q$, $K$, and $V$ matrices to be quite elegant at capturing such an simple yet illusive concept. 
+
+As in many DL approaches, the weights of the $W^Q$, $W^K$ and $W^V$ matrices were randomly initialized. During training, the model learns to adjust these weights in such a way that the resulting $Q$, $K$, and $V$ matrices capture the necessary information to compute meaningful attention scores.
+
+\begin{itemize}
+    \item [$Q$:] The query vector essentially represents what the current token asks of the rest, in order to narrow down its meaning. For example, the token "bank" can have two representations, one for the financial institution meaning and one for the river bank meaning. The query vector for "bank" would learn to "ask" the rest of the tokens if they have anything to do with a river or money, in an attempt to narrow down its own meaning. If the context is "I went to the bank to withdraw money", the query vector would learn to ask for information related to finance, while if the context is "The river bank was flooded", it would learn to ask for information related to geography. By the end of training the Query vector for "bank" would have learned to ask the right questions to narrow down its meaning in different contexts.
+    
+    \item {$K$:} The key vector represents the information that each token has to offer to the rest of the tokens. In our example, the token "money" would have a key vector that offers financial information, while the token "river" would have a key vector that offers geographical information. The key vectors are what the query vectors attend to in order to gather information about the context.
+
+    \item {$V$:} The value vector represents the actual information that each token has to offer. It is what gets weighted by the attention scores and summed to create the new representation of each token. In our example, the value vector for "money" would contain financial information, while the value vector for "river" would contain geographical information. The value vectors are what gets combined to create the new representation of each token based on the attention scores.
+\end{itemize}
+
+\subsection{Impact of the Transformer Paradigm}
+The introduction of the Transformer architecture represented a seismic shift in Natural Language Processing, moving the field from a sequential "memory-based" approach to a parallelized "attention-based" framework. The impact of this transition can be categorized into three primary dimensions:
+
+\begin{itemize}
+    \item \textbf{Computational Scalability:} By discarding the linear dependency of $h_{t}$ on $h_{t-1}$ found in RNNs, the Transformer allowed for massive parallelization across GPU hardware. This enabled the scaling of models to billions of parameters, a feat previously impossible due to the sequential bottleneck.
+    \item \textbf{Universal Contextualization:} Unlike LSTMs, where semantic signals often diluted over distance, the self-attention mechanism established a direct, constant-time connection between all tokens in a sequence. This resulted in a more robust and stable semantic manifold, where the representation of a word is strictly tied to its global context rather than its local neighbors.
+    \item \textbf{The Birth of Transfer Learning:} Perhaps the most significant impact was the decoupling of \textit{pre-training} from \textit{fine-tuning}. The Transformer provided a general-purpose "backbone" that could learn universal linguistic features from unlabelled data, which could then be specialized for diverse downstream tasks like sentiment analysis or question answering.
+\end{itemize}
+
+\section{Bidirectional Embedding Representations from Transformers (BERT)}
+As the field's understanding grew on how to better conceive representation of words and sentences and their underlying meaning, so did the scientific research around it. Just a year after the release of the paper that proposed the Transformer architecture, in 2018 Devlin et al. published "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding".
+
+\subsection{Previous Work and Major Concept}
+Before we dive deeper in the architecture behind BERT, let's see a number of clever ideas where it got its inspiration from:
+
+\begin{itemize}
+    \item \textbf{Transformer}: A rebellious idea in the NLP world, that replaced the heavily-used LSTM architecture. The consistency of its 2 major parts, the Encoder and the Decoder, alongside with the embedded groundbreaking Attention mechanism, resulted in a never-seen before experimental evaluation.
+    \item \textbf{ELMo}: ELMo (Embeddings for Language Models) provided a significant step towards pre-training in the context of NLP, as it introduced both the contextualized embedding for each word and the bi-directional 'scanning' for finding context.
+    \item \textbf{ULM-FiT}: Transfer learning methods to effectively itiziled what the models learned during pre-training, in order to fine-tune language models for various tasks.
+    \item \textbf{OpenAI Transformer}: By using only the Decoder of the Transformer architecture and masking future tokens to predict next words, it handles various downstream tasks.
+\end{itemize}
+
+BERT uses the best features of the above to create a new architecture. The authors took advantage of the Transformer by 'stealing' its Encoder and by combining it with ELMo's bi-directioniality and OpenAI's masking technique, they proposed a robust framework, whose experimental evaluation broke records amongst other language models, back when it was published.
+
+\subsection{Diving deeper into the BERT Framework and Architecture}
+BERT's model architecture consists of  a multi-layer bidirectional Transformer encoder and there are 2 model sizes proposed:
+
+\begin{enumerate}
+    \item \textbf{BERT Base}: Comparable in size to the OpenAI Transformer for performance comparison
+    \item \textbf{BERT Large}: A quite larger model, developed to achieve state of the art results
+\end{enumerate}
+
+
+Before talking about the main steps, let's analyze the Input and Output Representations. 
+For every sentence (token sequence) given as  \textbf{Input}, the first input token is always the special \textbf{[CLS]} token, which helps us with sentence classification tasks. If we want to split our token sequence in 2 distinct sequences, e.g. for Two-Sentence Tasks, we can use the special token \textbf{[SEP]} to seperate them. For \textbf{Output}, each position output a vector. For the sentence classification task we mentioned before, we mention on the vector that ouputs from the [CLS] Input and after passing it through a classifier we get our results. \\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/BERT_input_output.png}
+    \caption{BERT's Input and Output Representations}
+    \label{fig:placeholder}
+\end{figure}
+
+Finally, there are 2 steps in BERT's framework, \textbf{Pre-Training} and \textbf{Fine-Tuning}: 
+
+\subsubsection{Pre-Training}
+The model is trained on large amounts of unlabeled data, in order to achieve language processing abilities based on the training data set's patterns. Because of the fact that this model is bi-directional, words in a sequence should be treated with extreme caution, as it is possible that each word could see itself and therefore it would trivially predict the next word. The authors deal with this problem with a technique called \textbf{Masked Language Model (MLM)}, where 15\% of tokens are randomly masked for the model to predict. To avoid mismatches between the Pre-Training and Fine-Tuning step, of this 15\%, the 80\% of tokens are replaced with the special \textbf{[MASK]} token, the 10\% with a random token and the rest 10\% remain unchanged.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/BERT_pre_training.png}
+    \caption{BERT'S Pre-Training Phase}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsubsection{Fine-Tuning}
+Since we already have the parameters ready from the Pre-Training Phase, we simply 'plug-in' the task-specific inputs and outputs in our model and let it fine-tune all the parameters. Some of the downstream tasks that our model can fine tune to are: 
+
+\begin{enumerate}
+    \item \textbf{Sentence Pair Classification Tasks}
+    \item \textbf{Single Sentence Classification Tasks}
+    \item \textbf{Question Answering Tasks}
+    \item \textbf{Single Sentence Tagging Tasks}
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/BERT_fine_tuning.png}
+    \caption{BERT's Fine-Tuning Phase}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/BERT_downstream_tasks.png}
+    \caption{Various Downstream Tasks for Fine-Tuning with BERT}
+    \label{fig:placeholder}
+\end{figure}
+
+\section{TSAPM-BERT: Parametric Refinement for Emotion Prediction}
+\label{sec:tsapm}
+
+\subsection{Beyond Sentiment: Mapping the Emotion Manifold}
+
+While traditional sentiment analysis (SA) focuses on the binary or ternary classification of text into positive, negative, or neutral polarities \citep{kayal2026parametrically}, emotion detection seeks a higher level of granularity by identifying specific affective states. The TSAPM-BERT framework operates on an emotion space defined by six distinct classes: \textit{Sadness, Anger, Fear, Joy, Love,} and \textit{Surprise}.
+
+In a standard BERT embedding space, these emotions often overlap because they share similar semantic contexts (e.g., "fear" and "anger" both appearing in negative contexts). The "manifold" concept refers to the idea that these six emotions occupy specific, high-dimensional regions within the latent vector space. Traditional models often flatten this manifold into a simple binary axis, but TSAPM-BERT uses its parametric modifications to warp the space, creating clearer boundaries between these nuanced states.
+
+By mapping these six classes to binary labels—converting Joy, Love, and Surprise to positive (1) and Sadness, Anger, and Fear to negative (0)—the researchers demonstrate that a model with high emotional intelligence is inherently better at basic sentiment tasks. The goal of the parametric refinement is to ensure the model captures the "intensity" and "flavor" of the emotion, rather than just its general polarity.
+
+\subsection{Architectural Modification: The $\alpha$ and $\beta$ Parameters}
+% This is where we will work on the math of the attention and hidden state.
+To enhance the model's focus on emotionally charged vocabulary, the paper proposes a modification of the original BERT's parameters. Specifically, a modification of the attention formula ($A$), as well as the hidden state formula ($H$).
+
+This happens with the help of external sentiment lexicons and polarity scores dictionaries from sources like SentiWordNet. 
+
+While the use of such dictionaries isn't novel in it of itself, the injection of them in the parameter level is. Most literature regarding the topic of SA includes these lexicon based approaches on the auxiliary level, thus not providing fine grained emotion understanding capabilities to the model.
+
+\subsubsection{Parametric Attention Modification ($\alpha$)}
+Here the authors propose a modification of the original attention formula as follows;
+
+\begin{equation}
+    A' = \alpha A_{std} + (1 - \alpha)A_{sent}
+\end{equation}
+
+\begin{enumerate}
+    \item $A_{std}$ represents the original attention scores obtained from the pre-trained BERT's transformer layers
+    \item $A_{sent}$ denotes the sentiment-weighted attention, where sentiment lexicons and polarity scores are used to scale the attention given to sentiment-rich tokens.
+    \item $\alpha \in [0, 1]$ is a tunable hyperparameter controlling the balance between the original contextual attention and the sentiment-weighted component.
+\end{enumerate}
+
+This sentiment-aware attention $A'$ is designed
+to emphasize sentiment-bearing tokens while retaining the contextual dependencies learned by BERT. This approach ensures that tokens with strong emotional or opinionated cues are attended to in a proportionally higher degree than standard tokens, during the encoding process.
+
+By fixing $\alpha$, the researchers ensure that the "emotional signal" is consistently prioritized during the initial phases of the manifold construction, preventing the model from reverting to a generic, non-emotional state.
+
+\subsubsection{Intuition: Lexicon-Guided Latent Representations}
+% Explain why injecting Slex vectors "warps" the manifold in a useful way.
+Unlike the static $\alpha$, the $\beta$ parameter is a \textit{learnable weight} that is optimized during the fine-tuning process. It governs the integration of external sentiment-bearing features from the $S_{lex}$ (Sentiment Lexicon) into BERT's hidden states ($H$). The refined hidden representation $H'$ is calculated as:
+
+\begin{equation}
+    H' = H_{std} + \beta \cdot S_{lex}
+\end{equation}
+
+$S_{lex}$ is sentiment-bearing vector constructed by mapping the polarity score (positive, negative, neutral) obtained from \textbf{SentiWordNet} for each token, to a fixed-dimensional vector aligned with BERT’s hidden state dimension.
+
+This sentiment-bearing feature vector is injected into the models hidden state before the first Transformer block but after the initial embedding layer. This means that the input of the first Transformer block is essentially the sum of the following:
+
+\begin{itemize}
+    \item The initial \textit{token embedding}, obtained likely through an embedding layer such as WordPiece.
+    \item The \textit{segment embedding} that distinguishes between various units of text, such as separate sentences or paragraphs, within the input sequence.
+    \item The \textit{positional embedding} that captures the sequential order of tokens, allowing the transformer to understand the importance of word order in variable-length sequences.
+    \item The $S_{lex}$ vector, derived from external lexicons (SentiWordNet) to provide explicit polarity cues, which is scaled by the learnable weight β and added to the previous three components to form the refined hidden state $H'a$.
+\end{itemize}
+
+Intuitively, it is as if the researchers give a hint at the model before it begins the self-attention process, about the emotional weight of the word in it of itself, which will then later get refined through by attending to the rest of the tokens in the input sequence.
+
+Through the optimization of $\beta$, the model dynamically adjusts the "injection strength" of emotional metadata. This allows for a more fluid and adaptive refinement of the latent representations, where the model learns the optimal "mixture" of textual context and external emotional knowledge.
+
+\subsection{Training Protocol and Hyperparameter Configuration}
+
+The fine-tuning of the TSAPM-BERT model was conducted using a selective optimization strategy rather than a uniform update of all weights. By targeting specific layers, namely the attention, feed-forward, and embedding layers selectively rather than uniformly, the researchers aimed to balance the preservation of BERT's pre-trained linguistic knowledge with the injection of task-specific emotional metadata.
+
+The above approach was crucial. As the subsequent ablation studies demonstrate, the ability to freeze specific layers while selectively updating others, allowed for more fine grained optimization. This prevented the model from losing its pre-trained semantic foundations, a common failure point in the more coarse-grained, uniform fine-tuning methods typically employed in prior literature
+
+To ensure stable convergence and prevent the model from forgetting general semantic context, the following configurations were implemented:
+
+\begin{itemize}
+    \item \textbf{Optimizer:} The \textit{AdamW} optimizer was utilized with a weight decay of 0.01. This variant of the Adam optimizer is specifically chosen for Transformer models to provide better regularization by decoupling weight decay from the gradient update.
+    \item \textbf{Learning Rate Management:} A conservative learning rate of $2 \times 10^{-5}$ was paired with 500 warmup steps to facilitate gradual convergence in the early stages of training
+    \item \textbf{Regularization:} A dropout rate of 0.3 was applied across the modified layers to mitigate the risk of overfitting.
+    \item \textbf{Batch and Epochs:} The model was trained for 5 epochs with a batch size of 32, allowing for a thorough refinement of the $\beta$ and $\alpha$ parameters without over-exposure to the training set.
+\end{itemize}
+
+The specific hyperparameter values are summarized in Table \ref{tab:hyperparameters}.
+
+\begin{table}[H]
+\centering
+\caption{TSAPM-BERT Hyperparameter Settings}
+\label{tab:hyperparameters}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\ \hline
+Learning Rate           & $2 \times 10^{-5}$ \\ \hline
+Dropout Rate            & 0.3 \\ \hline
+Batch Size              & 32 \\ \hline
+Number of Epochs        & 5 \\ \hline
+Optimizer               & AdamW  \\ \hline
+Max Sequence Length     & 128 tokens  \\ \hline
+Warmup Steps            & 500  \\ \hline
+Weight Decay            & 0.01  \\ \hline
+\end{tabular}
+\end{table}
+
+This targeted fine-tuning approach successfully minimized the overfitting gap to approximately 0.85\%, as evidenced by the convergence of the training (99.37\%) and testing (98.52\%) accuracies.
+
+\subsection{Performance Evaluation and Ablation Analysis}
+
+\subsubsection{The Fine-Tuning Dataset}
+The model was trained and tested on an emotion dataset containing 18,000 rows, 9,725 unique tokens and six total emotion classes. Namely: Sadness, Anger, Fear, Joy, Love and Surprise. 
+
+A Training/Validation/Test split of 70/10/20 was used, along with a 5-fold cross-validation strategy to ensure unbiased and robust performance estimation.
+
+Performance was measured through a comprehensive suite of metrics, including Accuracy, Precision, Recall, F1-score, Sensitivity, and Specificity. Statistical significance was further validated through pairwise t-tests, confirming that the improvements offered by TSAPM-BERT were not the result of random chance ($p<0.05$).
+
+\subsubsection{Comparative Results}
+TSAPM-BERT achieved state-of-the-art results, significantly outperforming traditional machine learning, ensemble, and deep learning baselines, as well as other SOTA BERT models fine-tuned for the same task.
+
+\begin{itemize}
+    \item {\textbf{Accuracy: }}The model achieved a $99.37\%$  training accuracy and a $98.52\%$ testing accuracy.
+    \item {\textbf{Generalization: }}While baseline models like Naive Bayes achieved near-zero overfitting gaps, they did so at the cost of lower overall accuracy. TSAPM-BERT achieved a superior testing accuracy of $98.52\%$ while maintaining a minimal overfitting gap of $0.85\%$, indicating that the parametric modifications successfully regularized the high-capacity Transformer architecture
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/acc.png}
+    \caption{Performance metrics}
+\end{figure}
+
+Results on the CARER dataset when pitted against the other SOTA BERT models also showed superior results, demonstrating the effectiveness of the authors' proposed hybrid architecture and its strong generalization ability over existing sentiment and emotion classification methods. ***
+
+
+\subsection{Ablation Analysis: Quantifying Parametric Impact}
+
+To validate the structural necessity of the TSAPM-BERT modifications, the researchers conducted a series of ablation studies. These experiments systematically removed specific components to observe the resulting degradation in predictive performance.
+
+\subsubsection{Impact of Sentiment Lexicon ($S_{lex}$)}
+The first setting involved removing the sentiment-aware vector $S_{lex}$ ($\beta = 0$), forcing the model to rely solely on the contextual embeddings generated by standard BERT.
+
+\begin{itemize}
+    \item \textbf{Result:} A noticeable drop in accuracy, precision, recall, and F1-score across all classes
+    \item \textbf{Intuition:} This degradation indicates that while standard BERT is highly effective at capturing general semantic context, it lacks explicit sensitivity to emotional polarity. The absence of $S_{lex}$ particularly hindered the model's ability to distinguish subtle affective expressions in short or ambiguous texts.
+\end{itemize}
+
+
+\subsubsection{Effect of Weighted Attention Refinement ($\alpha$)}
+In this setting, the weighted attention mechanism was disabled by setting $\alpha = 1$, reverting the model to standard self-attention without sentiment-guided emphasis.
+
+\begin{itemize}
+    \item \textbf{Result:} A consistent reduction in Recall and F1-score, with the most significant impact observed in \textit{minority emotion classes} (e.g., Fear or Surprise)
+    \item \textbf{Intuition:} Without the weighted refinement, the model tends to distribute attention focus too uniformly across tokens, effectively diluting the influence of emotionally salient words. This confirms that $\alpha$ successfully guides the model to prioritize "emotionally informative" regions of the text.
+\end{itemize}
+
+\subsubsection{Parametric vs. Uniform Fine-Tuning}
+Finally, the researchers replaced TSAPM-BERT with a standard fine-tuned BERT model, removing the learnable parameters $\alpha$ and $\beta$ entirely and applying uniform fine-tuning.
+
+\begin{itemize}
+    \item \textbf{Result:} This configuration resulted in the \textbf{largest performance decline} of all ablation settings.
+    \item \textbf{Overfitting Analysis:} Crucially, this version showed a significantly increased overfitting gap. This proves that parametric control ($\alpha, \beta$) allows for a more stable learning process by balancing general pre-trained knowledge with task-specific emotional signals.
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\caption{Summary of Ablation Study Impacts}
+\label{tab:ablation}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Setting Removed} & \textbf{Primary Consequence} \\ \hline
+Sentiment Lexicon ($S_{lex}$) & Loss of sensitivity to emotional polarity  \\ \hline
+Weighted Attention ($\alpha$) & Focus dilution; drop in minority class F1-scores \\ \hline
+Parametric Control ($\alpha, \beta$) & Largest accuracy drop; increased overfitting gap \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Summary of Contributions}
+
+The primary contribution of the TSAPM-BERT framework is the demonstration that BERT's general-purpose architecture can be surgically modified to excel in niche, high-granularity tasks like emotion prediction. By moving away from uniform fine-tuning and instead utilizing learnable $\alpha$ and $\beta$ parameters to integrate external sentiment lexicons, the model achieved a state-of-the-art testing accuracy of 98.52\%. 
+
+The success of this approach lies in its "emotionally informed" representations, which provide a robust solution for interpreting the ambiguous and often sarcastic nature of social media data. For the purposes of this report, TSAPM-BERT serves as a benchmark for how external domain knowledge can be fused with pre-trained transformer architectures to push the boundaries of Natural Language Understanding.
+
+\subsection{Critical Analysis: Benchmarking and Domain Constraints}
+
+While the TSAPM-BERT model demonstrates a numerically superior accuracy of 98.52\%, a critical review of the comparative analysis in Table 7 of the paper reveals a significant methodological limitation. The authors primarily compare their results against other models evaluated on the CARER dataset; however, the most recent direct comparison provided for this specific dataset dates back to 2018 \citep{saravia2018carer}. 
+
+Furthermore, while the paper cites state-of-the-art (SOTA) models from 2024 and 2025, these were evaluated on disparate datasets such as the "Restaurant" domain \citep{zhao2025aspect}. Because emotional and linguistic manifolds vary drastically across different domains, this cross-dataset comparison lacks the "apples-to-apples" rigor required for a definitive claim of global superiority. Additionally, although the authors advocate for the model's adaptability, the current study lacks the cross-domain or multilingual validation they suggest for future research. This indicates that while the parametric modifications are highly effective for the CARER manifold, their universal applicability remains to be empirically proven.
+
+
+\clearpage
+\section{RexBERT: Domain Specialization through Data Curation}
+\label{sec:rexbert}
+
+\subsection{Motivation: The E-commerce Domain Gap}
+While general-purpose encoders like BERT and ModernBERT \citep{warner2025smarter} provide robust linguistic foundations, they often struggle with the unique structural and semantic properties of the e-commerce domain. Retail language is characterized by high entity density, semi-structured attribute-value pairs (e.g., "Screen Size: 6.5 inches"), and complex polysemy where product substitutes and complements must be mathematically distinguished. RexBERT was developed to bridge this gap by prioritizing high-quality in-domain data and a principled training curriculum over indiscriminate parameter scaling.
+
+\subsection{The Ecom-niverse Corpus: Distillation at Scale}
+The primary asset enabling RexBERT's specialization is \textit{Ecom-niverse}, a curated 350-billion-token corpus derived from the 4.4-trillion-token FineFineWeb collection. To isolate commerce-relevant text from general web noise, the authors employed a modular curation pipeline:
+
+The FineFineWeb collection contains entries of text and their respective domain labels. Because of the small number of possible labels, the authors manually split the categories that exhibit relevance to the e-commerce domain, into two categories. The "Directly Selected" ones, and the "Filter required" ones. The "Directly Selected" category involved categories with near-complete overlap with e-commerce, such as Fashion/Beauty (15.3\%). The ones requiring filtering presented less of overlap, such as "News" (12.7\%) and "Health" (8.9\%),
+
+Their proposed data curation pipeline is described as follows:
+\begin{itemize}
+    \item \textbf{Sampling:} A sampling strategy was used to select a smaller yet representative subset of items from each relevant domain category, ensuring a manageable volume for manual annotation while preserving the diversity of the original corpus.
+    \item \textbf{Instruction-Tuning:} A smaller, instruction-tuned model (Phi-4) was used to assign binary "Relevant/Not Relevant" labels to sampled items, while a stronger model (Llama3-70B) audited these labels for consistency.
+    \item \textbf{FastText Distillation:} These high-quality labels were distilled into scalable fastText classifiers. This process distills the essential classification logic of the much heavier LLMs into a much smaller and more efficient fastText classifier, enabling the high-throughput scoring and thresholded filtering of the entire corpus of each of the selected relevant domains.
+    \item \textbf{Classifier Validation:} Each classifier is validated with held-out evaluation and/or cross-validation to assess generalization within its domain and to calibrate score distributions.
+    \item \textbf{Corpus Assembly:} Finally, the validated fastText models are applied at scale to their corresponding FineFineWeb domain partitions, producing relevance scores for all items; a domain-wise threshold on these scores yields the retained subset, resulting in a validated,e-commerce focused corpus for pre-training.
+    
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{img/rex_cleaning_pipeline.png}
+    \caption{Ecom-niverse curation pipeline}
+    \label{fig:placeholder}
+\end{figure}
+
+While RexBERT categorizes its target domains into 'Directly Selected' and 'Filter Required,' the subsequent pipeline treats these groups with identical algorithmic rigor. This categorization appears to be a descriptive framework for characterizing source purity and justifying the need for domain-conditioned filters, rather than an operational branching in the curation logic
+
+\subsection{Architectural Foundation: ModernBERT Integration}
+RexBERT utilizes a BERT-style encoder that incorporates several transformative enhancements from the ModernBERT architecture \citep{warner2025smarter}. These modifications are designed to optimize the semantic manifold's efficiency, stability, and context-handling capabilities:
+
+\begin{itemize}
+    \item \textbf{Biasless Layers and Pre-normalization:} The authors removed the bias terms from the linear layers. In addition, while the original BERT architecture utilized Post-Layer Normalization, effectively normalizing the residual sum at the exit of each sublayer, RexBERT adopts a Pre-Norm configuration. This ensures that the primary residual branch remains un-normalized, providing a more stable 'gradient highway' that facilitates the training of deeper architectures like RexBERT-Large. These changes follow ModernBert's initiative to use the saved compute towards another purpose such as deeper architectures and longer training for the same budget, and maintaining training stability in deep architectures by preventing gradient instability.
+    \item \textbf{Rotary Positional Embeddings (RoPE):} Moving beyond the absolute positional embeddings of the original BERT, RexBERT adopts RoPE. RoPE lets transformers understand relative positions naturally and generalize to longer sequences without retraining or extra parameters.
+    \item \textbf{GeGLU Activations:} The model replaces standard GELU activations with Gated Linear Units (GeGLU), which provide superior optimization performance and a more expressive latent space.
+    \item \textbf{Alternating Global and Local Attention:} Standard attention has a quadratic $O(N^2)$ complexity, making it too slow for RexBERT's 8,192 token sequences. To solve this, the model alternates between local sliding windows, which only process nearby tokens to save compute, and full global layers that maintain the big picture context. This hybrid design allows the model to process long product descriptions efficiently without losing the ability to connect distant pieces of information.
+    \item \textbf{Unpadding and Flash Attention:} Standard BERT models waste significant computation by processing the so called padding tokens in sequences shorter than the maximum length. RexBERT adopts unpadding to strip away these filler tokens, ensuring the GPU only processes actual data. Combined with Flash Attention, which is a hardware-aware implementation that accelerates the attention calculation, the model achieves a much higher throughput than the original architecture.
+    \item \textbf{Hardware-Aware Depth:} The Micro, Mini, Base and Large variants follow a deep-and-narrow design to maximize GPU utilization within parameter budgets
+\end{itemize}
+
+\subsection{The Three-Phase Pre-training Recipe}
+RexBERT avoids the pitfalls of "from-scratch" domain training by utilizing a three-phase curriculum designed to build a stable semantic manifold before introducing specialized retail complexity. This curriculum functions as a staged progression that prevents catastrophic forgetting while expanding the model's contextual horizon.
+
+\begin{itemize}
+    \item \textbf{Phase 1: General Foundation (1.7T Tokens):} The model begins with a broad "diet" of 1.7 trillion tokens encompassing web text, code, and multilingual technical papers. This phase uses a shorter sequence length of 512 tokens to maximize computational efficiency and establish robust initial token representations.
+    \item \textbf{Phase 2: Context Extension (250B Tokens):} Following the general pre-training, the checkpoint is trained for an additional 250 billion tokens to expand the context window to 8,192 tokens. This phase allows the model to generalize to longer sequence scenarios, such as complex product tables and concatenated attribute blocks, which are critical for e-commerce semantics.
+    \item \textbf{Phase 3: Annealed Specialization (350B Tokens):} In the final phase, the model is "annealed" onto the 350-billion-token Ecom-niverse corpus. The sampling distribution is gradually shifted toward retail-specific data, allowing the model to specialize its latent representations for the commerce domain without losing its general linguistic capabilities.
+\end{itemize}
+
+\subsection{Guided MLM: Strategic Latent Refinement}
+To further refine the latent semantic space during the annealing phase, RexBERT introduces \textit{Guided MLM}, a targeted masking strategy that acts as a domain signal amplifier. While standard BERT architectures mask tokens at random, Guided MLM prioritizes "high-value" spans that carry the most significant emotional and structural weight in a retail context
+
+\begin{itemize}
+    \item \textbf{Entity and Attribute Targeting:} The pipeline pre-identifies domain-relevant spans, such as brand names, technical specifications, and product attributes, and preferentially masks these elements. This forces the model to learn the compositional logic required to reconstruct complex product descriptors from sparse context.
+    \item \textbf{The 5\% Mixture Strategy:} To maintain broad NLU performance, Guided MLM sequences only account for approximately 5\% of each training batch. The remaining 95\% of the batch follows a standard random span-masking scheme, ensuring the model's "generalist" knowledge is preserved while it gains "specialist" expertise.
+    \item \textbf{Outcome on Latent Space:} This strategic refinement results in improved ordering of graded relevance in the embedding space, allowing the model to more accurately distinguish between subtle product relationships, such as substitutes versus complements.
+\end{itemize}
+
+\subsection{Evaluation: Benchmarks and Pareto Efficiency}
+The performance of RexBERT was validated across both general linguistic tasks and domain-specific e-commerce benchmarks. The results demonstrate that a refined training curriculum on high-quality data can supersede raw parameter scaling, moving the model toward the \textit{Pareto frontier} of efficiency.
+
+\begin{table}[h]
+\centering
+\caption{Comparative performance on e-commerce and general benchmarks.}
+\label{tab:rexbert_results}
+\begin{tabular}{lccc}
+\hline
+\textbf{Model} & \textbf{Params} & \textbf{ESCI-token (Avg k=1,3,5)} & \textbf{GLUE (Avg)} \\ \hline
+RexBERT-Mini & \textbf{68M} & \textbf{77.52}       & 89.31       \\
+
+ModernBERT-Base & 149M           & 75.13               & 89.90                \\
+\textbf{RexBERT-Base} & \textbf{150M} & \textbf{81.22}       & \textbf{90.62}       \\
+
+ModernBERT-Large & 395M           & 78.91               & 92.54               \\
+\textbf{RexBERT-Large} & \textbf{400M} & \textbf{83.67}      & \textbf{92.69}       \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{E-commerce Specialization (ESCI):} On the Amazon ESCI benchmark, RexBERT-Mini (68M parameters) outperformed models more than twice its size. This confirms that the training regime of a much smaller model on a high-quality, domain specific dataset, can outweigh the more broadly trained, albeit much bigger, generalist model such as ModernBERT-Base.
+    \item \textbf{Generalization (GLUE):} Despite its specialization, RexBERT maintains competitive performance on the GLUE benchmark. This stability is attributed to the 5\% Guided MLM mixture and the phased training approach, which prevents the "forgetting" of general linguistic structures during domain adaptation.s
+\end{itemize}
+
+\subsection{Summary of Contributions}
+The presented paper contributes the following:
+
+\begin{enumerate}
+    \item \textbf{Ecom-niverse:} A curated, high-quality 350B token collection of retail-relevant text. This corpus was distilled from the 4.4T FineFineWeb collection using a domain-conditioned LLM-based curation pipeline, providing a high-quality foundation for e-commerce specialization.
+    \item \textbf{A Three-step training regime} based on a modernised encoder architecture. In includes (1) pre-training on a diverse mixture of multiple-domain text (2) context extension to support longer sequences (8,192 tokens), and (3) annealing, which gradually shifts the sampling distribution toward Ecom-niverse and incorporates a Guided MLM masking strategy.
+    \item \textbf{Efficiency and Pareto Optimization:} A demonstration that 2--3$\times$ smaller models can outperform significantly larger generalist models on domain-specific benchmarks. Specifically, RexBERT-Mini (68M) achieves higher ESCI accuracy than ModernBERT-Base (149M) while maintaining, and in the case of the Base and Large variants, even surpassing competitive performance on general linguistic tasks (GLUE).
+\end{enumerate}
+
+
+\clearpage
+% --- BIBLIOGRAPHY SECTION ---
+\bibliographystyle{plainnat}
+\bibliography{citations/references}
+
+\end{document}
