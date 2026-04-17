@@ -1,41 +1,72 @@
 \babel@toc {english}{}\relax 
-\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
-\contentsline {section}{\numberline {2}The State of NLP in 2017}{3}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Sequential Processing and Parallelization}{3}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}The Long-Range Dependency Problem}{3}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Static vs. Contextual Embeddings}{4}{subsection.2.3}%
-\contentsline {section}{\numberline {3}The Transformer Revolution}{4}{section.3}%
-\contentsline {subsection}{\numberline {3.1}The Core Architecture}{4}{subsection.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.1}Self-Attention}{6}{subsubsection.3.1.1}%
-\contentsline {subsubsection}{\numberline {3.1.2}Multi-Headed Attention}{8}{subsubsection.3.1.2}%
-\contentsline {subsubsection}{\numberline {3.1.3}The Decoder}{9}{subsubsection.3.1.3}%
-\contentsline {subsection}{\numberline {3.2}The intuition behind Self-Attention}{10}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Impact of the Transformer Paradigm}{11}{subsection.3.3}%
-\contentsline {section}{\numberline {4}Bidirectional Embedding Representations from Transformers (BERT)}{12}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Previous Work and Major Concept}{12}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Diving deeper into the BERT Framework and Architecture}{13}{subsection.4.2}%
-\contentsline {subsubsection}{\numberline {4.2.1}Pre-Training}{14}{subsubsection.4.2.1}%
-\contentsline {subsubsection}{\numberline {4.2.2}Fine-Tuning}{15}{subsubsection.4.2.2}%
-\contentsline {section}{\numberline {5}TSAPM-BERT: Parametric Refinement for Emotion Prediction}{16}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Beyond Sentiment: Mapping the Emotion Manifold}{16}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Architectural Modification: The $\alpha $ and $\TextOrMath {\textbeta }{\mathbeta }$ Parameters}{17}{subsection.5.2}%
-\contentsline {subsubsection}{\numberline {5.2.1}Parametric Attention Modification ($\alpha $)}{17}{subsubsection.5.2.1}%
-\contentsline {subsubsection}{\numberline {5.2.2}Intuition: Lexicon-Guided Latent Representations}{18}{subsubsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.3}Training Protocol and Hyperparameter Configuration}{19}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Performance Evaluation and Ablation Analysis}{20}{subsection.5.4}%
-\contentsline {subsubsection}{\numberline {5.4.1}The Fine-Tuning Dataset}{20}{subsubsection.5.4.1}%
-\contentsline {subsubsection}{\numberline {5.4.2}Comparative Results}{21}{subsubsection.5.4.2}%
-\contentsline {subsection}{\numberline {5.5}Ablation Analysis: Quantifying Parametric Impact}{21}{subsection.5.5}%
-\contentsline {subsubsection}{\numberline {5.5.1}Impact of Sentiment Lexicon ($S_{lex}$)}{21}{subsubsection.5.5.1}%
-\contentsline {subsubsection}{\numberline {5.5.2}Effect of Weighted Attention Refinement ($\alpha $)}{22}{subsubsection.5.5.2}%
-\contentsline {subsubsection}{\numberline {5.5.3}Parametric vs. Uniform Fine-Tuning}{23}{subsubsection.5.5.3}%
-\contentsline {subsection}{\numberline {5.6}Summary of Contributions}{23}{subsection.5.6}%
-\contentsline {subsection}{\numberline {5.7}Critical Analysis: Benchmarking and Domain Constraints}{24}{subsection.5.7}%
-\contentsline {section}{\numberline {6}RexBERT: Domain Specialization through Data Curation}{25}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Motivation: The E-commerce Domain Gap}{25}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}The Ecom-niverse Corpus: Distillation at Scale}{25}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3}Architectural Foundation: ModernBERT Integration}{27}{subsection.6.3}%
-\contentsline {subsection}{\numberline {6.4}The Three-Phase Pre-training Recipe}{28}{subsection.6.4}%
-\contentsline {subsection}{\numberline {6.5}Guided MLM: Strategic Latent Refinement}{28}{subsection.6.5}%
-\contentsline {subsection}{\numberline {6.6}Evaluation: Benchmarks and Pareto Efficiency}{29}{subsection.6.6}%
-\contentsline {subsection}{\numberline {6.7}Summary of Contributions}{30}{subsection.6.7}%
+\contentsline {section}{\numberline {1}Introduction}{4}{section.1}%
+\contentsline {section}{\numberline {2}The State of NLP in 2017}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Sequential Processing and Parallelization}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}The Long-Range Dependency Problem}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Static vs. Contextual Embeddings}{5}{subsection.2.3}%
+\contentsline {section}{\numberline {3}The Transformer Revolution}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}The Core Architecture}{5}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Self-Attention}{7}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Multi-Headed Attention}{9}{subsubsection.3.1.2}%
+\contentsline {subsubsection}{\numberline {3.1.3}The Decoder}{10}{subsubsection.3.1.3}%
+\contentsline {subsection}{\numberline {3.2}The intuition behind Self-Attention}{11}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Impact of the Transformer Paradigm}{12}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Bidirectional Embedding Representations from Transformers (BERT)}{13}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Previous Work and Major Concept}{13}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Diving deeper into the BERT Framework and Architecture}{14}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Pre-Training}{15}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Fine-Tuning}{16}{subsubsection.4.2.2}%
+\contentsline {section}{\numberline {5}TSAPM-BERT: Parametric Refinement for Emotion Prediction}{17}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Beyond Sentiment: Mapping the Emotion Manifold}{17}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Architectural Modification: The $\alpha $ and $\TextOrMath {\textbeta }{\mathbeta }$ Parameters}{18}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Parametric Attention Modification ($\alpha $)}{18}{subsubsection.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.2}Intuition: Lexicon-Guided Latent Representations}{19}{subsubsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.3}Training Protocol and Hyperparameter Configuration}{20}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Performance Evaluation and Ablation Analysis}{21}{subsection.5.4}%
+\contentsline {subsubsection}{\numberline {5.4.1}The Fine-Tuning Dataset}{21}{subsubsection.5.4.1}%
+\contentsline {subsubsection}{\numberline {5.4.2}Comparative Results}{22}{subsubsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.5}Ablation Analysis: Quantifying Parametric Impact}{22}{subsection.5.5}%
+\contentsline {subsubsection}{\numberline {5.5.1}Impact of Sentiment Lexicon ($S_{lex}$)}{22}{subsubsection.5.5.1}%
+\contentsline {subsubsection}{\numberline {5.5.2}Effect of Weighted Attention Refinement ($\alpha $)}{23}{subsubsection.5.5.2}%
+\contentsline {subsubsection}{\numberline {5.5.3}Parametric vs. Uniform Fine-Tuning}{24}{subsubsection.5.5.3}%
+\contentsline {subsection}{\numberline {5.6}Summary of Contributions}{24}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}Critical Analysis: Benchmarking and Domain Constraints}{25}{subsection.5.7}%
+\contentsline {section}{\numberline {6}RexBERT: Domain Specialization through Data Curation}{26}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Motivation: The E-commerce Domain Gap}{26}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}The Ecom-niverse Corpus: Distillation at Scale}{26}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Architectural Foundation: ModernBERT Integration}{28}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}The Three-Phase Pre-training Recipe}{29}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Guided MLM: Strategic Latent Refinement}{29}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Evaluation: Benchmarks and Pareto Efficiency}{30}{subsection.6.6}%
+\contentsline {subsection}{\numberline {6.7}Summary of Contributions}{31}{subsection.6.7}%
+\contentsline {section}{\numberline {7}Multitask Learning and BERT Embedding for Subjectivity Detection and Aspect-Based Sentiment Analysis}{32}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Review Analysis in the E-Commerce Era}{32}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Key Components}{33}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}Aspect-Based Sentiment Analysis (ABSA)}{33}{subsubsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2}Subjectivity Detection (SD)}{33}{subsubsection.7.2.2}%
+\contentsline {subsubsection}{\numberline {7.2.3}Multitask Learning}{34}{subsubsection.7.2.3}%
+\contentsline {subsubsection}{\numberline {7.2.4}BERT Embeddings}{35}{subsubsection.7.2.4}%
+\contentsline {subsection}{\numberline {7.3}SMABSA Framework}{35}{subsection.7.3}%
+\contentsline {subsubsection}{\numberline {7.3.1}Definitions and Notations}{35}{subsubsection.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.2}General Architecture Overview}{36}{subsubsection.7.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.3}Shared Embedding Layer \bbl@greek@ampersand Bi-LSTM Networks}{37}{subsubsection.7.3.3}%
+\contentsline {subsubsection}{\numberline {7.3.4}Self Attention Layer}{37}{subsubsection.7.3.4}%
+\contentsline {subsubsection}{\numberline {7.3.5}Neural Tensor Network (NTN)}{37}{subsubsection.7.3.5}%
+\contentsline {subsubsection}{\numberline {7.3.6}Classification Layer}{38}{subsubsection.7.3.6}%
+\contentsline {subsubsection}{\numberline {7.3.7}Training Objective}{38}{subsubsection.7.3.7}%
+\contentsline {subsection}{\numberline {7.4}Ablation Study}{39}{subsection.7.4}%
+\contentsline {section}{\numberline {8}Domain-Adaptive PreTraining using transformer-based models for occupational safety applications}{40}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Introduction}{40}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Methodology Overview}{40}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Multi-Source Domain Corpus Development}{41}{subsection.8.3}%
+\contentsline {subsubsection}{\numberline {8.3.1}Sources}{42}{subsubsection.8.3.1}%
+\contentsline {subsubsection}{\numberline {8.3.2}Tokenization}{42}{subsubsection.8.3.2}%
+\contentsline {subsubsection}{\numberline {8.3.3}Sequence processing and Categorization for batch construction}{42}{subsubsection.8.3.3}%
+\contentsline {subsubsection}{\numberline {8.3.4}Source Domain Imbalance}{43}{subsubsection.8.3.4}%
+\contentsline {subsection}{\numberline {8.4}Domain-Adapative PreTraining}{43}{subsection.8.4}%
+\contentsline {subsubsection}{\numberline {8.4.1}Masked Language Modeling (MLM)}{44}{subsubsection.8.4.1}%
+\contentsline {subsubsection}{\numberline {8.4.2}Domain-Adapted Model Evaluation}{45}{subsubsection.8.4.2}%
+\contentsline {subsection}{\numberline {8.5}Downstream Domain-Specific Fine-Tuning}{45}{subsection.8.5}%
+\contentsline {subsubsection}{\numberline {8.5.1}Corpus Development}{46}{subsubsection.8.5.1}%
+\contentsline {subsubsection}{\numberline {8.5.2}Data Preprocessing}{46}{subsubsection.8.5.2}%
+\contentsline {subsubsection}{\numberline {8.5.3}Fine-Tuning Approaches}{46}{subsubsection.8.5.3}%

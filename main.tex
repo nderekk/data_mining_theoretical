@@ -13,6 +13,7 @@
 \usepackage{geometry}
 \usepackage{fancyhdr}
 \usepackage{setspace}
+\usepackage{booktabs}
 \usepackage{titlesec}  % For title formatting
 \geometry{margin=1in}
 \setstretch{1.5}
@@ -539,6 +540,269 @@ The presented paper contributes the following:
     \item \textbf{Efficiency and Pareto Optimization:} A demonstration that 2--3$\times$ smaller models can outperform significantly larger generalist models on domain-specific benchmarks. Specifically, RexBERT-Mini (68M) achieves higher ESCI accuracy than ModernBERT-Base (149M) while maintaining, and in the case of the Base and Large variants, even surpassing competitive performance on general linguistic tasks (GLUE).
 \end{enumerate}
 
+\section{Multitask Learning and BERT Embedding for Subjectivity Detection and
+Aspect-Based Sentiment Analysis}
+
+\subsection{Review Analysis in the E-Commerce Era}
+The majority of communication between merchants and clients online happens throguh reviews and product feedbacks. For the merchant, it is completely and utterly important to carefully read and analyze the response to what he has been producing. However, the huge amounts of reviews on the internet turn this procedure on something that takes huge amounts of time, so we turn on the need for something automized. Even though sentenc-level sentiment analysis 
+might seem to be a good fit, it oversees how the real client reacts to a product and that is by focusing on its aspects (e.g. color,price,etc.). That is why researches approached the problem with \textbf{Aspect-Based Sentiment Analysis (ABSA)}, a more aspect-focused approach on classifying a text's sentiment by giving more weight to the 'protagonistic' entities. Alongside this, researches also turn their focus on \textbf{Subjectivity Detection (SD)}. 
+We care more for subjective than objective opinions, as by filtering out the objective ones, which by the way can be classified of 'Neural' sentiment, the model assigns fine-grained sentiments only on subjective aspects, thus avoiding its 'confusion' and reducing false positives in sentiment classification. By exploiting multitask learning, this approach tends to prove the generalization achieved by the combination of the 2 tasks and the remarkable 
+state-of-the-art results they achieve. The key contributions, as mentioned on the paper, are:
+
+\begin{enumerate}
+    \item {Developing a multitask learning model that jointly optimizes subjectivity detection and aspect-level sentiment classification tasks}
+    \item {Incorporating subjectivity knowledge through the contextual information and semantic knowledge encoded in BERT embeddings to further boost the performance of the multitask learning model}
+    \item {Addressing class imbalance issues by demonstrating that the proposed framework effectively addresses precision-recall imbalance problems}
+\end{enumerate}
+
+\subsection{Key Components}
+Before we dive deeper into the framework's architecture, we are going to analyze it's key components, both conceptually and technically.
+\subsubsection{Aspect-Based Sentiment Analysis (ABSA)}
+When we talk about Aspect-Based Sentiment Analysis (ABSA), we want to understand what are the emotions linked to product features or attributes in a document (text,review,etc.). Moreover, we want to realise the impact that these emotions have in the entire document's polarity, which can be positive, neutral or negative. Even though it sounds simple, the challenge to the sentiment classification task arrives when we want to realise how the semantic associations 
+develop between the main aspect feature of the sentence and its surrounding contextual elements. Previous papers have a defined the key elements for conducting an ABSA research. These are \textbf{Aspect term a}, which is the target of opinion, \textbf{Aspect opinion o}, which is the classification of target, \textbf{Opinion term o}, the sentiment conveying to the opinion about the target and \textbf{Sentiment Polarity p}, the emotional attitude linked to an aspect termm.They also define a series 'textbook' ABSA tasks, which we call single ABSA tasks, and their combinations, the compound ABSA tasks. These are:
+
+\begin{enumerate}
+    \item \textbf{Aspect Term Extraction (ATE)}
+    \item \textbf{Aspect Category Detection (ACD)}
+    \item \textbf{Opinion Term Extraction (OTE)}
+    \item \textbf{Aspect Sentiment Classification (ASC)}
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/ABSA_tasks.png}
+    \caption{Single and Compound ABSA Tasks}
+\end{figure}
+
+The compound ABSA tasks formed by the single ones can be seen on the corresponding image. 
+
+\subsubsection{Subjectivity Detection (SD)}
+The objective of Subjectivity Detection (SD) is to distinguish subjective content, which includes personal opinions and emotions of clients about products, from objective content. For example, let's say we have the following online review about a phone : "Its huge 7.9 inch screen cannot fit into my pocket, but I love its bright green color.". Obviously, the screen size is a standard feature that cannot change from phone to phone, thus being characterized as large is objective. On the other hand, the color constant, not only on phones but on any products, is completely subjective, as other clients may find green 
+as a repulsive choice for a phone color. Why would the authors want to classify subjectivity alongside ABSA in a single model? The answer is that their intuition drove them to test SD as an auxiliary subtask besides ABSA, with the hope that it will potentially enhance the entire pipeline's performance, by extracting meaningful insights from the document.
+
+\subsubsection{Multitask Learning}
+Even though past publications opted for training ABSA subtasks independently from each other, the authors on this paper choose to embrace a Multitask Learning Framework for their research. The reason is that with such framework, the model can learn a shared information representation between tasks, that will potentially enhance the overall performance, especially boosting single tasks more than by training them one at a time. The authors state the 3 reasons written below to justify their choice:
+
+\begin{enumerate}
+    \item The shared representations acquired across multiple tasks can facilitate improved generalization.
+    \item The mutually beneficial relationships between tasks can enhance the performance of individual tasks during the multitask training process.
+    \item A single model capable of handling multiple tasks simultaneously can lead to reduced system complexity.
+\end{enumerate}
+
+\subsubsection{BERT Embeddings}
+Last but not least, the choice of pre-trained transformer based language models is obvious for various NLP tasks and ABSA is no exclusion. For this experiment, \textbf{Bidirectional Encoder Representation Transformer (BERT)} was chosen, due to its great state-of-the-art results. Its bidirectional Transformer network, which allows for it to look both right and left of the target word to better understand the surrounding context, along with its 2-phase deployment phase (Pre-Training and Fine-Tuning), 
+allow it to better capture semantic and syntactic information from the text it is parsing, which are both really important for our ABSA framework as we mentioned before. This is also backed up by previous studies which used transformer-based language models to tackle the ABSA problem and they outperformed the previously used neural architectures.
+
+\subsection{SMABSA Framework}
+\subsubsection{Definitions and Notations}
+Before we analyze the architecture of \textbf{Subjectivity Multitask Aspect-based Sentiment Analysis (SMABSA)}, let's first see the notations we are going to use. From the previously mentioned single ABSA tasks, the main task that this research studie is \textbf{Aspect Sentiment Classification (ASC)}. The input is a sentence ($S={w_1,w_2,...,w_n}$) and an aspect term withing that sentence ($a={w_i,...,w_j}$) and the output y will be the sentiment polarity of a in S ($y \in \{positive,neutral,negative\}$). The auxiliary task of Subjectivity Detection aims to mark the same aspect term a with a binary label z (0 for objectivity, 1 for subjectivity). These 2 tasks are jointly trained and tested on a 
+\textbf{Multitask Learning Framework (MTL)} and by this procedure we gain great generalization ability, as the framework can learn simultaneously by combining shared knowledge of the 2 tasks. In the table below, you can see some examples about the input and ouput notation we just defined.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/SMABSA_sentence_examples.png}
+    \caption{Input and Ouputut Notation for SMABSA}
+\end{figure}
+
+\subsubsection{General Architecture Overview}
+The proposed Multitask Learning Approach is built upon a BERT Embeddings Layer, which shares results to 2 Bi-LSTM networks, one for each task. After both forward and backward contextual dependencies of tokens are captured, a self-attention mechanism follows to highlight the relevant words of input sequence for classification. The weighted results of the self-attention mechanism are fed into a Neurl Tensor Network, which  captures the complex interactions between the task-specific representations and finally, its ouputs are passed in a classifcation mechanism for the inal decisions to be extracted. You can see a generalized schema of the architecture in the image below, followed by a more spoecialised 
+and analytical view on each of the framework's component.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{img/SMABSA_architecture.png}
+    \caption{Abstract Architecture Schema for SMABSA}
+\end{figure}
+
+\subsubsection{Shared Embedding Layer \& Bi-LSTM Networks}
+The first step is the passing of our input, that is the sentence and aspect terms, into a shared embedding layer. The input is tokenized using WordPiece Tokenizer and then forwarded into the BERT Encoder. In that way, contextualized embeddings are generated for each token in the sequence. The output is a sequence of tokens ($H=\{h_0,h_1,...,h_n\}$), where h\_i is the hidden output of the BERT model in the i-th position. The BERT version used in this framework is BERT Base, which may not have the same number of parameters as BERT Large, it is much more computationally efficient. The BERT Encoder's Layers are fed into 2 Bi-Directional Long Short-Term Memory (LSTM) Modules, one for each task, which decompose H and learn the context-rich task-specific representations for the 2 subtasks. The following forward and backward contextual dependencies are enabled:
+\begin{align}
+h_t^{\text{forward}} &= \mathrm{LSTM}_{\text{forward}}(h_t, h_{t-1}^{\text{forward}}) \\
+h_t^{\text{backward}} &= \mathrm{LSTM}_{\text{backward}}(h_t, h_{t+1}^{\text{backward}}) \\
+h_t^{\text{BiLSTM}} &= \left[ h_t^{\text{forward}} \,;\, h_t^{\text{backward}} \right]
+\end{align}
+
+\subsubsection{Self Attention Layer}
+To capture which words have the biggest impact on the classifcation of our sentence, a Self-Attention Layer is added. Having the embedding input H from the Shared Embedding Layer and Bi-LSTM Networks, we calculated weighted scores a ($a=\{a_0,a_1,...,a_n\}$) for each token, which represent the crucial meaning that it has on our 2-task classification. We mutliply a with H, so we get the weighted represenation for each input token.
+\begin{align}
+\alpha &= \mathrm{softmax}\left(W_b^{T} \cdot \tanh\left(W_a \cdot H\right)\right) \\
+v &= \alpha \cdot H^{T}
+\end{align}
+
+\subsubsection{Neural Tensor Network (NTN)}
+The weighted word representation obtained by the Self-Attention Layer is flattened before it is inputed in the Neural Tensor Network (NTN). NTN is the heart of multitask learning, as it captures the interactions between ABSA and SD and is able to develop the complex joint representations of both tasks in a single multitask framework. The combination of the 2 tasks happens with the help of a bilinear tensor transformation, which is defined by the following equation:
+\begin{align}
+v_{\text{NTN}} &= \tanh\left((v_{\text{subj}} \oplus v_{\text{asc}}) W + (v_{\text{subj}})^{T} \cdot G \cdot v_{\text{asc}} + b \right)
+\end{align}
+
+\subsubsection{Classification Layer}
+The final component of the architecture is of course the classification part. There 2 classification layers, one for ASC and one for SD. More specifically:
+
+\begin{itemize}
+    \item \textbf{Subjectivity Detection (SD)}:The output of Self-Attention Layer as the represenation of the input sentence, which is later passed through a fully connected layer followed by softmax.
+    \begin{align}
+    \rho_{\text{subj}} &= \mathrm{softmax}\left(v_{\text{subj}} \cdot W_{\text{subj}} + b_{\text{subj}}\right) \\
+    y_{\text{subj}} &= \arg\max\left(\rho_{\text{subj}}[j]\right)
+    \end{align}
+    The output is either 0 or 1, corresponding to objective or subjective.
+    \item \textbf{Aspect Sentiment Classification (ASC)}:Concatenation of NTN Ouput with Self-Attention Output, again passed through fully connected layer with softmax activation.
+    \begin{align}
+    \rho_{\text{asc}} &= \mathrm{softmax}\left((v_{\text{asc}} \oplus v_{\text{NTN}}) \cdot W_{\text{asc}} + b_{\text{asc}}\right) \\
+    y_{\text{asc}} &= \arg\max\left(\rho_{\text{asc}}[k]\right)
+    \end{align}
+    The ouput is 0, 1 or 2, corresponding to positive, negative or neutral.
+\end{itemize}
+
+\subsubsection{Training Objective}
+For optimization, a loss-function that combines losses from both tasks was used. The \textbf{Categorical Cross-Entropy Loss Function} which is used as the objective function is:
+
+\begin{align}
+\mathcal{L}_{\text{ABSA,SD}} &= -\frac{1}{N} \sum_{i=1}^{N} \sum_{j=0}^{C-1} y_{ij}^{*} \log\left(P_i[j]\right)
+\end{align}
+
+The total loss is the aggregated sum of the loss of both tasks:
+
+\begin{align}
+\mathcal{L}_{\text{total}} &= \mathcal{L}_{\text{ABSA}} + \mathcal{L}_{\text{SD}}
+\end{align}
+
+\subsection{Ablation Study}
+The Ablation Study, which is the validation of the contribution of each architectural component, offers very useful insight in the model's overall perfromance. Each component was removed one at a time and experiments
+would be ran on each new subversion of the framework. The results on the corresponding paper show us that the entire hypothesis that this whole study was based on, which is that by assigning SD as an auxiliary subtask
+the performance of the ABSA task will improve and therefore better results will be provided, turns out to be true. \textbf{The removal of the Subjectivity Detection component results to the decrease of both accuracy and F1-Score}.
+
+\begin{table}[htpb]
+\centering
+\begin{tabular}{lll}
+\toprule
+Model variant & Accuracy (\%) & F1-score (\%) \\
+\midrule
+SMABSA (full model) & 88.15 & 87.26 \\
+w/o Subjectivity detection (SD) & 83.92 & 69.81 \\
+w/o Bi-LSTM & 86.45 & 85.53 \\
+w/o Self-attention & 86.88 & 85.99 \\
+w/o NTN (using concatenation) & 87.21 & 86.34 \\
+\bottomrule
+\end{tabular}
+\caption{Ablation study results}
+\label{tab:ablation_SMABSA}
+\end{table}
+
+
+\section{Domain-Adaptive PreTraining using transformer-based models for occupational safety applications}
+
+\subsection{Introduction}
+Even though occupational safety should have been addressed as soon as possible as state-of-the-art technologies have emerged, it remains a persistent global challenge. While on the past structured datasets were used to mine data related to this field, the main source of data should be taken from unstructured data, such as accident text-based reports, as they offer
+a significant context source. Such sources can be valuable to train models that know how to extract the contextual meaning out of such documents, and one of the best frameworks that can be used today is \textbf{Bidirectional Encoder Representations for Transformers (BERT)}. This research focuses on adding another stage of pre-training on these models, a technique
+called \textbf{Domain-Adaptive PreTraining (DAPT)} to give additional contextual boost to the already pre-trained BERT model. The experimental phase includes implementation on the BERT model itself, as well as a variant of it called \textbf{A Light BERT (ALBERT)}. A pipeline is created where each of these 2 models are used to process natural language and thus 2 new frameworks
+occur, \textbf{safetyBERT} and \textbf{safetyALBERT}. After training on an extensive dataset of multiple sources, the results that are concluded
+are optimal comparing to other contemporary frameworks and prove how DAPT enhances language understanding in domains such as occupational safety and hazards.
+
+\subsection{Methodology Overview}
+We are now going to see the consisting parts of the framework. Keep in mind the the central premise of the study is to show that pre-trained language models, like BERT and ALBERT which we use, can benefit by an additional layer of pre-training, that being DAPT, as it will increase the the model's comprehension of domain-specific nuances. The 3 parts of our framework are the following:
+
+\begin{enumerate}
+    \item \textbf{Multi-Source Domain Corpus Development}: Analyzes the creation of the DAPT training dataset, including data cleaning and pre-processing techniques.
+    \item \textbf{Domain-Adapative PreTraining}: Pre-training BERT and ALBERT on the previously created dataset, to further increase the model's ability on handling safety occupation-based documents. 
+    \item \textbf{Downstream Domain-Specific Fine-Tuning}: The fine tuning following the pre-training of the previous step to validate the model's ability on real life data and experimentally assess its abilities.
+\end{enumerate}
+
+A more analyzed view on the parts can be seen on the following image. On the rest of this analysis, we will furthermore develop the decisions and implementions on the framework's modules.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{img/DAPT_framework.png}
+    \caption{Framework Overview}
+\end{figure}
+
+\subsection{Multi-Source Domain Corpus Development}
+What kind of dataset is needed to enhance the already pre-trained language models and make them more task-specified on the specific domain of industrial hazards? The structured dataset consists of multiple sources of corpus, so rich as to satisfy the levels of the required terminology and contextual meaning of the field.
+
+\subsubsection{Sources}
+The new datasets consists of 7 sources across academic literature, regulatory agencies and industrial organizations, where signifcant data were extracted using 2 frameworks, the Academic Abstract Collection Framework and Accident Narrative Collection Framework. Moreover, academic journal abstracts from well-known publishers were also incorporated, to broaden the model's terminology. Finally, 
+more unstructured data sources were, such as incident narratives, were also collected from multiple regulatory and incident sources. The resulting corpus seems perfectly balanced in technical terminology and practical language, ensuring that the included language patterns will effectively boosts the model's comprehension on the targeted domain.
+
+\subsubsection{Tokenization}
+In order for our language models to process the newly created corpus, we need to prepare our data for efficient training. The 2 steps we are following are tokenization and input sequence processing. Tokenization is a pre-processing technique, which breaks the input into smaller parts called tokens, which will be the input to our language models. For \textbf{BERT} we are using the pre-trained \textbf{WordPiece} Tokenizer
+and for \textbf{ALBERT} we are using the \textbf{SentencePiece} Tokenizer. Also, special tokens, such as [CLS] for Classification or [MASK] for masking tokens, were added according to the requirements of the MLMs.
+
+\subsubsection{Sequence processing and Categorization for batch construction}
+Another problem that needs to be faces is variable input length, as the self-attention operation used in transformer-based models seems to not scale on an efficient rate. This problem is present in our newly created corpus, which seems to be highly heterogenous in the matter of length. An upper token limit set to 512 was set to for our standard width context window size in BERT and ALBERT and for texts exceeding this limit, 
+overlapping chunking strategy was implemented with a predefined stride parameter. Last but not least, for computational efficiency, the sequences were categorized in diferrent buckets/batches, according to the token length. Inside each bucket, all the tokens were padded to the length of the longest sequence, saving both memory and facing the variable lenght input problem. Before training, the batches are randomly shuffled to ensure diversity,
+keeping in the same times the efficient memory management.
+
+\subsubsection{Source Domain Imbalance}
+The last challenge that arises in our data collecting and pre-processing phase is the source imbalance in the newly created corpus. This is unwanted, as it can bias the model towards one end and thus overfit. To face this, the authors introduce a weighted sampling approach, to fairly sample sources during batch construction. The equation used for the weights is the following:
+
+\begin{align}
+\omega_s = \frac{N_{\text{total}}}{N_s}
+\end{align}
+
+where $\omega_s$ is the weight for source $s$, $N_{\text{total}}$ is the total number of samples and $N_s$ is the number of samples from source $s$. From source $s$, we sample with a probability of:
+
+\begin{align}
+P(x_i) \propto \omega_{s(i)}
+\end{align}
+
+This approach ensures that when random shuffling the batches before training, all sources get the same chance of being chosen and thus we have the same occurence from sequences across all sources.
+
+\subsection{Domain-Adapative PreTraining}
+As previously metioned, this study takes already pre-trained language models, which are BERT and ALBERT, and 'force' them in another round of pre-training on a specific field to specify the model's fit to it. This procedure, also known as \textbf{Domain-Adapative PreTraining (DAPT)}, is believed to improve results in downstream tasks, such as increased contextuality on the new field. In this section, 2 basic topics of DAPT are analyzed: \textbf{MLM} and \textbf{Domain-Adapated Model Evaluation}.
+
+\subsubsection{Masked Language Modeling (MLM)}
+Even though it was first suggested that the pre-training of BERT models should consist of 2 part, masking and Next Sentence Prediction (NSP), only masking is used in this study due to the proven inefficiency of NSP. There are 5 stages in which the BERT and ALBERT models go thorugh DAPT:
+
+\begin{enumerate}
+    \item \textbf{Data Preparation}: As analyzed in the previous section.
+    \item \textbf{Input Embedding Construction}: The Input Embeddings are an aggregation of \textbf{Token Embeddings}, \textbf{Segment Embeddings} and \textbf{Position Embeddings}, where BERT uses full-dimensional embeddings (768 dimensions) and ALBERT uses a factorized approach with less parameters (128 dimensions), projected to the original 768 dimensions.
+    \item \textbf{Input Masking}: Tokens are strategically and dynamically replaced with [MASK] special tokens, where the model tries to predict them. 
+    \item \textbf{Masked Sequence Processing}: The masked sequence are processed through the transformer encoded architectures, where BERT uses independent parameters across 12 layers and ALBERT employs parameter sharing, thus reducing once again the number of them.
+    \item \textbf{MLM Prediction}: The predictions after masking are finally made, using an FFNN and the softmax activvation function. 
+\end{enumerate}
+
+For optimization, the following cross-entropy loss function is applied:
+
+\begin{align}
+L_{\text{MLM}} = - \sum \log P(w_i \mid \tilde{w})
+\end{align}
+
+ , where $w_i$ is the correct token at masked position i and $\tilde{w}$ is sequence with masked tokens. The function is minimized using the AdamW optimizer with weight decay and learning rate.
+
+\subsubsection{Domain-Adapted Model Evaluation}
+In this study, both Intrinsic and Extrinsinc Model Evaluation Metrics are used. For \textbf{Intrinsic Evaluation}, Pseudo-Perplexity is a meaningful metric for BERT evaluation. Let $W=(w_1,w_2,...,w_n)$ be a sequence of tokens. The \textbf{pseudo-log-likelihood (PLL)} is defined as:
+
+\begin{align}
+\text{PLL}(W) = \sum_{t=1}^{|W|} \log P(w_t \mid W_{\setminus t}; \theta)
+\end{align}
+
+, where $W_{\setminus t}$ are all the tokens in the sequence except the tokens in position t. \textbf{PPPL} is derived from this as a normalization over sequence length:
+
+\begin{align}
+\text{PPPL}(W) = \exp\left( -\frac{1}{N} \cdot \text{PLL}(W) \right)
+\end{align}
+
+Finally, for fair comparison between models with different subword tokenization schemes, like BERT and ALBERT are, a word-normalized version is used:
+
+\begin{align}
+\text{PPPL}_w(W) = \exp\left( -\frac{1}{N_w} \cdot \text{PLL}(W) \right)
+\end{align}
+
+For \textbf{Extrisinc Evaluation}, as task-specific classification will be added in the fine-tuning section, we use the \textbf{Weighted F1 Score}, as it effectively balances the precision-recall trade off.
+
+\subsection{Downstream Domain-Specific Fine-Tuning}
+Now that the language models have passed another phase of pre-training, the domain-adapted one, it is time to evaluate that procedure on downstream domain-specific classification tasks. The evaluation happens by mainly comparing the models before and after DAPT and against other diverse baseline models. The fine-tuning phase consists of the \textbf{Corpus Development},
+\textbf{Data Preprocessing} and finally we will see some \textbf{Fine-Tuning Approaches}.
+
+\subsubsection{Corpus Development}
+The first step is the development of a specialized corpus to fine-tune the 2-time pre-trained language models. This corpus consists of unstructured data from the MSHA Accident Narratives, from the period of January 2022 to February 2025. We tested it on classification of accident type, mining equipment and degree of injury, using both single task and multi task learning approaches. To test the models on smaller sources, the Alaska mining injuries insurance claim was employed, which was fine-tuned on claim type and injured body part classification.
+
+\subsubsection{Data Preprocessing}
+The MSHA Dataset initially contains 40 classes for accident type and 75 classes for mining equipment. In order to enable a more generalized learning for the model, the authors group these categories and end up in a reduced number of more meaningful categories, 9 for accident type and 8 for mining equipment. To increase data quality, authors also remove entries with missing values. For the Alaska mining accident insurance claim for the non-fatal accident dataset, only missing values were removed again to ensure the quality of data.
+
+\subsubsection{Fine-Tuning Approaches}
+Next, some fine-tuning strategies will be presented to show how DAPT can further be optimized. Firstly, \textbf{Single-Task Learning} is when each classification objective is addressed independently. As previously stated, safetBERT and safetyALBERT are utilized and a simple classification layer is added. Big importance must be given to the final hidden state of the classification layer, which carries the special token [CLS]. During single-task classification fine-tuning, all parameters remain frozen and the quality of classification is calculated with Cross-Entropy Loss. Secondly, on the same fashion, \textbf{Multi-Task Learning}
+trains multiple classification objectives at the same times. This can be helpful, as tasks can develop inherent relationships between them and thus a more reliable result is given. The implementation utilizes a shared transformer encoder and ReLU as activation function. Again, all parameters remain frozen during training and Loss Balancing is the weighted sum of the individual task losses, with equal weights so no task is favored over another. Lastly, \textbf{Hyperparameter Optimization} is of important significance to the model's efficiency as well. The authors use grid search with n-fold cross-validation to identify optimal model 
+configurations for both single-task and multi-task learning frameworks, with more evaluation metrics such as F1-Score, Precision, Recall, etc. used to find the optimal hyperparameters.
 
 \clearpage
 % --- BIBLIOGRAPHY SECTION ---
