@@ -135,7 +135,6 @@ Finally, steps two to five can be described as follows:
 \begin{equation}
     Z = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
 \end{equation}
-The following steps repeat the process until a special symbol is reached indicating the transformer decoder has completed its output. The output of each step is fed to the bottom decoder in the next time step, and the decoders bubble up their decoding results just like the encoders did. And just like we did with the encoder inputs, we embed and add positional encoding to those decoder inputs to indicate the position of each word.
 Where $Z$ is the output of the self-attention layer. Each row of $Z$ corresponds to the new representation of each token in the input sequence, which is a weighted sum of the value vectors of all tokens, where the weights are determined by the attention scores.
 
 \subsubsection{Multi-Headed Attention}
@@ -197,7 +196,7 @@ The introduction of the Transformer architecture represented a seismic shift in 
     \item \textbf{The Birth of Transfer Learning:} Perhaps the most significant impact was the decoupling of \textit{pre-training} from \textit{fine-tuning}. The Transformer provided a general-purpose "backbone" that could learn universal linguistic features from unlabelled data, which could then be specialized for diverse downstream tasks like sentiment analysis or question answering.
 \end{itemize}
 
-\section{Bidirectional Embedding Representations from Transformers (BERT)}
+\section{Bidirectional Enoder Representations from Transformers (BERT)}
 As the field's understanding grew on how to better conceive representation of words and sentences and their underlying meaning, so did the scientific research around it. Just a year after the release of the paper that proposed the Transformer architecture, in 2018 Devlin et al. published "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding".
 
 \subsection{Previous Work and Major Concept}

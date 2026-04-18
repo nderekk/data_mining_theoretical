@@ -11,11 +11,11 @@
 \contentsline {subsubsection}{\numberline {3.1.3}The Decoder}{10}{subsubsection.3.1.3}%
 \contentsline {subsection}{\numberline {3.2}The intuition behind Self-Attention}{11}{subsection.3.2}%
 \contentsline {subsection}{\numberline {3.3}Impact of the Transformer Paradigm}{12}{subsection.3.3}%
-\contentsline {section}{\numberline {4}Bidirectional Embedding Representations from Transformers (BERT)}{13}{section.4}%
+\contentsline {section}{\numberline {4}Bidirectional Enoder Representations from Transformers (BERT)}{12}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Previous Work and Major Concept}{13}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Diving deeper into the BERT Framework and Architecture}{14}{subsection.4.2}%
-\contentsline {subsubsection}{\numberline {4.2.1}Pre-Training}{15}{subsubsection.4.2.1}%
-\contentsline {subsubsection}{\numberline {4.2.2}Fine-Tuning}{16}{subsubsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2}Diving deeper into the BERT Framework and Architecture}{13}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Pre-Training}{14}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Fine-Tuning}{15}{subsubsection.4.2.2}%
 \contentsline {section}{\numberline {5}TSAPM-BERT: Parametric Refinement for Emotion Prediction}{17}{section.5}%
 \contentsline {subsection}{\numberline {5.1}Beyond Sentiment: Mapping the Emotion Manifold}{17}{subsection.5.1}%
 \contentsline {subsection}{\numberline {5.2}Architectural Modification: The $\alpha $ and $\TextOrMath {\textbeta }{\mathbeta }$ Parameters}{18}{subsection.5.2}%
