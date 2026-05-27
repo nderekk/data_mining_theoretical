@@ -803,6 +803,179 @@ Next, some fine-tuning strategies will be presented to show how DAPT can further
 trains multiple classification objectives at the same times. This can be helpful, as tasks can develop inherent relationships between them and thus a more reliable result is given. The implementation utilizes a shared transformer encoder and ReLU as activation function. Again, all parameters remain frozen during training and Loss Balancing is the weighted sum of the individual task losses, with equal weights so no task is favored over another. Lastly, \textbf{Hyperparameter Optimization} is of important significance to the model's efficiency as well. The authors use grid search with n-fold cross-validation to identify optimal model 
 configurations for both single-task and multi-task learning frameworks, with more evaluation metrics such as F1-Score, Precision, Recall, etc. used to find the optimal hyperparameters.
 
+\section{Extended Literature Review}
+
+\subsection{Representation Learning: Matryoshka Representation Learning}
+
+A implicit assumption underlying most embedding-based systems is that all downstream 
+tasks require the same representational capacity. In practice, however, a coarse 
+document retrieval task and a fine-grained semantic similarity task have fundamentally 
+different precision requirements, yet both are typically served by the same 
+fixed-dimensional embedding vector. This rigidity forces practitioners into an 
+uncomfortable tradeoff: train a large, expensive embedding model for maximum accuracy, 
+or train a smaller, faster one and accept a performance penalty. \citet{kusupati2022matryoshka} 
+address this limitation directly with \textit{Matryoshka Representation Learning} (MRL).
+
+The core insight of MRL is deceptively simple: rather than optimizing a model to 
+produce a single fixed-size embedding, train it such that the first $m$ dimensions 
+of the output vector are independently meaningful for every $m$ in a chosen set 
+$\mathcal{M} = \{8, 16, 32, 64, \ldots, d\}$. This is achieved by modifying the 
+training loss to be a weighted sum of losses computed at each target dimensionality:
+
+\begin{equation}
+    \min_{\{\mathbf{W}^{(m)}\}_{m \in \mathcal{M}},\, \theta_F} 
+    \frac{1}{N} \sum_{i \in [N]} \sum_{m \in \mathcal{M}} 
+    c_m \cdot \mathcal{L}\!\left(\mathbf{W}^{(m)} \cdot F(x_i; \theta_F)_{1:m};\, y_i\right)
+\end{equation}
+
+where $c_m$ is a scalar weight controlling the relative importance of each 
+dimensionality during training, $\mathbf{W}^{(m)}$ is a learned linear layer 
+that projects the first $m$ dimensions of the embedding into the classification 
+space, and $\mathcal{L}$ is the multi-class softmax cross-entropy loss computed 
+against the ground truth label $y_i$. The rest of the training pipeline remains 
+unchanged, MRL is a modification of the loss function, not the architecture.
+
+The authors also propose \textit{MRL-E} (Efficient MRL), which eliminates the need 
+for separate linear projection layers per dimensionality. Instead of projecting the 
+full representation down to $m$ dimensions via learned weight matrices $W_m$, MRL-E 
+simply truncates the embedding vector at position $m$ directly. This means the 
+overhead of MRL-E over standard embedding training is negligible, as no additional 
+parameters or projection steps are introduced.
+
+The key empirical finding is that MRL embeddings, when truncated to $m$ dimensions, 
+achieve approximately 97--99\% of the performance of a dedicated model independently 
+trained at that same dimensionality $m$. Critically, this holds across a single 
+model, meaning one MRL-trained model can replace an entire family of fixed-size 
+embedding models without retraining. This was validated across large-scale 
+classification and retrieval benchmarks, where lower-dimensional MRL embeddings 
+matched the accuracy of their dedicated counterparts while offering substantial 
+reductions in inference latency and memory footprint.
+
+The authors draw an analogy to the brain's natural coarse-to-fine processing 
+hierarchy, where rough semantic distinctions are established before fine-grained 
+details are resolved. MRL operationalizes this principle in the embedding space: the 
+early dimensions capture the most salient semantic structure, with subsequent 
+dimensions progressively refining the representation. Notably, this property 
+generalizes to intermediate dimensionalities not explicitly included in $\mathcal{M}$ 
+during training, suggesting that the learned representations are smoothly structured 
+rather than discretely partitioned.
+
+The relevance of MRL to the broader themes of this report is direct. RexBERT's 
+evaluation on retrieval benchmarks such as ESCI implicitly relies on the assumption 
+that embedding dimensionality is fixed at inference time. MRL challenges this 
+assumption, offering a principled framework for adaptive-precision retrieval that 
+could be applied on top of any encoder, including the domain-specialized encoders 
+explored in this report.
+
+\subsection{Catastrophic Forgetting in Large Language Models}
+
+Catastrophic forgetting refers to the tendency of neural networks to lose previously
+acquired capabilities when fine-tuned on new tasks sequentially, without access to
+prior training data. While this phenomenon has been documented empirically across
+many model families, the internal mechanisms driving it in large transformer-based
+models remained poorly understood. \citet{imanov2026mechanistic} address this gap
+with a systematic mechanistic analysis of catastrophic forgetting during sequential
+fine-tuning, studying six contemporary LLM architectures spanning 109B to 1.5T
+parameters across twelve task sequences of varying inter-task similarity.
+
+The study identifies three primary mechanisms that collectively drive forgetting,
+each operating at a distinct architectural level and timescale.
+
+\textbf{Attention Mechanism Disruption.} The first and earliest mechanism involves
+the disruption of attention heads in the lower layers of the network. When attention
+weights were frozen during fine-tuning, forgetting was reduced by 64 percent compared
+to full fine-tuning, establishing attention mechanisms as the primary driver of
+early-stage forgetting. Approximately 15 to 23 percent of attention heads across all
+layers underwent severe reorganization, defined as weight changes exceeding 2.5
+standard deviations from the mean. Critically, of these severely disrupted heads,
+only 31 percent showed high activation levels when processing new task data, indicating
+that fine-tuning is largely non-selective, disrupting many heads that play no role
+in acquiring the new capability. This was confirmed causally by an ablation
+experiment: restoring the 20 percent most disrupted heads to their pre-fine-tuning
+state recovered 47 percent of lost performance on the original task while degrading
+new task performance by only 8 percent. The asymmetry of this result confirms that
+the fine-tuning process overwrites task-irrelevant attention circuits as collateral
+damage rather than targeting specific parameters.
+
+\textbf{Representational Drift in Intermediate Layers.} The second mechanism
+operates at the level of hidden representations in the intermediate layers of the
+model. Using Centered Kernel Alignment (CKA), a metric measuring representational
+similarity before and after fine-tuning, the authors found that intermediate layers
+(layers 8 to 16 in 24-layer architectures) exhibited the largest drift, with CKA
+scores decreasing by 0.32 to 0.47 on a 0 to 1 scale. Principal component analysis
+revealed that the leading components, accounting for 60 to 75 percent of
+representational variance, rotated by 35 to 52 degrees on average during fine-tuning,
+while higher-order components remained relatively stable. This suggests fine-tuning
+preferentially disrupts the dominant, most general representational structure of the
+model rather than its more granular, task-specific features. Notably, drift magnitude
+showed no significant correlation with task-relevance of individual dimensions
+(Pearson $r = 0.12$, $p = 0.24$), confirming that representational drift is
+indiscriminate. A realignment intervention that restored intermediate representations
+to their pre-fine-tuning geometry recovered 38 percent of lost task performance with
+only 6 percent degradation on the new task.
+
+\textbf{Gradient Interference.} The third mechanism concerns the optimization
+dynamics during sequential fine-tuning. For any two tasks, one can compute the
+cosine similarity between their respective gradient vectors in parameter space, that
+is, the degree to which the two tasks pull the model's parameters in compatible or
+conflicting directions. The authors find that when gradient cosine similarity falls
+below $-0.3$, indicating substantial conflict, forgetting rates increase by 2.4 times
+compared to conditions of positive gradient alignment. Interference localized
+disproportionately to the query and key projection matrices of the attention layers,
+with 67 percent of these parameters experiencing gradient conflicts, compared to
+34 percent for value projections and 29 percent for feedforward weights. Importantly,
+gradient alignment measured during the very first epoch of fine-tuning, before any
+observable accuracy degradation, already predicted final forgetting magnitude with
+$r = -0.79$ ($p < 0.001$), establishing gradient interference as a practical early
+warning signal for catastrophic forgetting.
+
+\textbf{Loss Landscape Flattening.} The fourth mechanism operates at the level of
+loss landscape geometry. After training on a task, the model resides in a sharp
+minimum in parameter space, characterized by high curvature and a strong restoring
+force that would pull the model back toward good performance if it drifts. Sequential
+fine-tuning progressively flattens this minimum: the maximum Hessian eigenvalue for
+the original task's loss function decreased from 147.3 at convergence to 34.2 after
+three subsequent tasks. As the landscape flattens, the restoring force disappears
+and forgetting becomes increasingly irreversible. Critically, this flattening was
+detectable 1 to 2 epochs before any observable accuracy drop, making it another
+prospective signature of impending forgetting.
+
+\textbf{Integrated Model and Implications.} These four mechanisms interact
+synergistically across different timescales. Gradient interference and attention
+disruption dominate in early epochs (1 to 2), representational drift accumulates
+progressively over epochs 3 to 5, and loss landscape flattening emerges as a
+longer-term consequence after epoch 4 or more. A combined intervention targeting
+both attention head restoration and representational realignment recovered 71 percent
+of original task performance, demonstrating that the mechanisms are partially
+independent and their effects additive.
+
+One counterintuitive finding is that higher inter-task similarity was associated with
+more severe forgetting in these experiments, not less. The authors attribute this to
+the fact that similar tasks produce gradients that appear globally aligned but
+introduce subtle, localized conflicts in specific parameter subsets, particularly the
+query and key projection matrices, creating a false impression of compatibility while
+damage accumulates in specific circuits.
+
+For the broader context of this report, these findings carry direct implications.
+All four assigned papers involve some form of continued pre-training or fine-tuning
+of BERT-based encoders, and the design choices made in each, such as RexBERT's
+phased training curriculum, safetyBERT's weighted corpus sampling, and TSAPM-BERT's
+selective layer freezing, can be understood as implicit mitigations of the mechanisms
+identified here. It is worth noting, however, that the paper's experimental scope
+is limited to decoder-only and mixture-of-experts architectures. Whether the same
+three mechanisms govern forgetting in encoder-only models like BERT remains an open
+question, and extending this mechanistic framework to encoders represents a natural
+direction for future work.
+
+\subsection{Encoder Architecture: ModernBERT}
+% TODO: Write ModernBERT content here
+
+\subsection{Efficient Encoders: Mixture-of-Experts Approaches}
+% TODO: Write MoE/SB-MoE content here
+
+\subsection{Multitask Learning for Sentiment and Emotion Analysis}
+% TODO: Write Hussain et al. content here
+
 \clearpage
 % --- BIBLIOGRAPHY SECTION ---
 \bibliographystyle{plainnat}
