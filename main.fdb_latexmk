@@ -1,15 +1,15 @@
 # Fdb version 4
-["bibtex main"] 1776514314.26986 "main.aux" "main.bbl" "main" 1776514317.89556 0
+["bibtex main"] 1779886214.79908 "main.aux" "main.bbl" "main" 1779886217.24081 0
   "./citations/references.bib" 1775730747.46667 2886 ad0997accd3363b258f9d3972c51a9c8 ""
   "/usr/local/texlive/2026/texmf-dist/bibtex/bst/natbib/plainnat.bst" 1233624470 26816 ffe5423d2019860bad9f54bc402fac15 ""
-  "main.aux" 1776514317.50409 16731 04f33ccffa93c3e4b780f04abe2f743b "pdflatex"
-  "titlepage.aux" 1776514315.16981 1176 891dd67567a5809aad8ce9dedd23ff6a "pdflatex"
+  "main.aux" 1779886217.00455 17637 c762e5ea75ae525b5c5f5cf2a3c25ab9 "pdflatex"
+  "titlepage.aux" 1779886215.50265 1176 891dd67567a5809aad8ce9dedd23ff6a "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1776514314.36216 "/Users/koules/Developer/4th_year/data_mining/theoretical_project/data_mining_theoretical/main.tex" "main.pdf" "main" 1776514317.89579 0
-  "/Users/koules/Developer/4th_year/data_mining/theoretical_project/data_mining_theoretical/main.tex" 1776514311.44102 78482 dd40ec8a898c189481c8320421b7df73 ""
+["pdflatex"] 1779886214.89188 "/Users/koules/Developer/4th_year/data_mining/theoretical_project/data_mining_theoretical/main.tex" "main.pdf" "main" 1779886217.24095 0
+  "/Users/koules/Developer/4th_year/data_mining/theoretical_project/data_mining_theoretical/main.tex" 1779886212.14504 79037 da0807d528a8258136655525a35e8834 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm" 1136768653 1536 74b7293ec3713bb7fdca8dd1bd1f469c ""
@@ -153,12 +153,12 @@
   "img/transformer_architecture_high.png" 1775477276 34778 5a7e5477e4c10d2f79baffbd41c8c871 ""
   "img/upatras.jpg" 1775477276 117065 11f22aeaa390e6cebb063b168f619a3c ""
   "img/xray_encoder.png" 1775477276 123708 0751052c18ca81c411a39c609cac2758 ""
-  "main.aux" 1776514317.50409 16731 04f33ccffa93c3e4b780f04abe2f743b "pdflatex"
-  "main.bbl" 1776514314.36013 3296 aeff0ce5e7c25e64e5e32a3e2077b2e4 "bibtex main"
-  "main.out" 1776514317.50664 16591 be18dd3ae1ce27e31fff037a5a1e05a4 "pdflatex"
-  "main.tex" 1776514311.44102 78482 dd40ec8a898c189481c8320421b7df73 ""
-  "main.toc" 1776514317.50692 7424 616985729aee38799255783e8489aa6e "pdflatex"
-  "titlepage.aux" 1776514315.16981 1176 891dd67567a5809aad8ce9dedd23ff6a "pdflatex"
+  "main.aux" 1779886217.00455 17637 c762e5ea75ae525b5c5f5cf2a3c25ab9 "pdflatex"
+  "main.bbl" 1779886214.89002 3296 aeff0ce5e7c25e64e5e32a3e2077b2e4 "bibtex main"
+  "main.out" 1779886217.00643 18331 7bb2fbd0719ebce1e71bf1b75d8b8c68 "pdflatex"
+  "main.tex" 1779886212.14504 79037 da0807d528a8258136655525a35e8834 ""
+  "main.toc" 1779886217.00665 8084 8f2f411e5a208a9cc97964a0dbf8e7cb "pdflatex"
+  "titlepage.aux" 1779886215.50265 1176 891dd67567a5809aad8ce9dedd23ff6a "pdflatex"
   "titlepage.tex" 1775477276 719 daddcf1067dd647e50739de2245d915a ""
   (generated)
   "main.aux"
