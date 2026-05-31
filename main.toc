@@ -72,7 +72,12 @@
 \contentsline {subsubsection}{\numberline {8.5.3}Fine-Tuning Approaches}{46}{subsubsection.8.5.3}%
 \contentsline {section}{\numberline {9}Extended Literature Review}{47}{section.9}%
 \contentsline {subsection}{\numberline {9.1}Representation Learning: Matryoshka Representation Learning}{47}{subsection.9.1}%
-\contentsline {subsection}{\numberline {9.2}Catastrophic Forgetting in Large Language Models}{47}{subsection.9.2}%
-\contentsline {subsection}{\numberline {9.3}Encoder Architecture: ModernBERT}{47}{subsection.9.3}%
-\contentsline {subsection}{\numberline {9.4}Efficient Encoders: Mixture-of-Experts Approaches}{47}{subsection.9.4}%
-\contentsline {subsection}{\numberline {9.5}Multitask Learning for Sentiment and Emotion Analysis}{47}{subsection.9.5}%
+\contentsline {subsection}{\numberline {9.2}Catastrophic Forgetting in Large Language Models}{48}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Encoder Architecture: ModernBERT}{51}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}Mixture of Experts Approaches in Dense Retrieval Tasks}{51}{subsection.9.4}%
+\contentsline {subsubsection}{\numberline {9.4.1}Mixture-of-Experts Block}{52}{subsubsection.9.4.1}%
+\contentsline {subsubsection}{\numberline {9.4.2}Architecture}{52}{subsubsection.9.4.2}%
+\contentsline {subsubsection}{\numberline {9.4.3}Results}{53}{subsubsection.9.4.3}%
+\contentsline {subsection}{\numberline {9.5}Multitask Learning for Sentiment and Emotion Analysis using resource constrained MobileBERT and DistilBERT}{54}{subsection.9.5}%
+\contentsline {subsubsection}{\numberline {9.5.1}Pipeline Architecture}{54}{subsubsection.9.5.1}%
+\contentsline {subsubsection}{\numberline {9.5.2}Results and Ablation Study}{56}{subsubsection.9.5.2}%

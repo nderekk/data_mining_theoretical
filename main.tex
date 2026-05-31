@@ -970,11 +970,65 @@ direction for future work.
 \subsection{Encoder Architecture: ModernBERT}
 % TODO: Write ModernBERT content here
 
-\subsection{Efficient Encoders: Mixture-of-Experts Approaches}
-% TODO: Write MoE/SB-MoE content here
+\subsection{Mixture of Experts Approaches in Dense Retrieval Tasks}
+As it is known, the primary goal of Information Retrieval is to efficiently identify, rank and deliver the most relevant information from a large collection of data in response to a user's query. In the past, Sparse Retrieval Models (sparse-lexicon models) were used as a solution to IR's goal. Even though the keyword matching technique that SRMs supported between the user's query and the document
+made sense at first, its big gap was that such models were missing the semantic similarity between words or phrases. For example, if a user would search for 'fast electric car' documents including exactly these words would be returned. However, documents containing informations about 'speedy EV', which semantically refer to the same topic as the user's query, would be missed. For that reason, Dense Retrieval
+Models (DRMs) were proposed. DRMs are based on the Transformer model, and more specifically on BERT, therefore allowing the networks to capture semantic meaning between query and document. DRMs map both queries and documents into the embedding space, where semantic similarity equals to geometric closenes and for that reason a similarity score is finally employed to assess the resemblance between query and document.
+A big problem that DRMs faced was generalization, as they perfrom really well on specific tasks they are fine tuned to but lack the ability of generalizing on larger domains. The authors propose a framework by employing a single block Mixrure-of-Experts (SB-MoE) right after the final Transformer layer of the underlying DRMs. 
 
-\subsection{Multitask Learning for Sentiment and Emotion Analysis}
-% TODO: Write Hussain et al. content here
+\subsubsection{Mixture-of-Experts Block}
+The SB-MoE added after the DRMs consists of multiple pairs of Feed-Forward Networks (FFNs), where each one is specialized in somehting diferrent than the others (that's why they are called 'experts'). After an input, a gating function (neural network which assigns a weight to each expert) determines how relevant each expert is to the input and along a pooling strategy, the final prediction of the model.
+
+\subsubsection{Architecture}
+SB-MOE builds on a standard bi-encoder architecture, where one of four underlying base models — Contriever (110M parameters), BERT-Base (110M), BERT-Small (29M), or TinyBERT (14.5M) — independently encodes the query and document into dense vector embeddings. 
+The SB-MoE is then appended after the final Transformer layer of whichever base model is used, acting on both the query and document embeddings simultaneously . The gating function, consisting of a single hidden layer that halves the vector dimension followed by an output layer
+sized to the number of experts, is trained end-to-end in an unsupervised manner alongside the underlying DRM and the experts themselves. Each expert follows the adapter architecture, with a down-projection layer that halves the input dimension and an up-projection that restores it, plus a skip connection for residual learning. At inference time, the model operates in one of two modes:
+$SB-MOE_TOP-1$, which selects only the expert assigned the highest gating score, or $SB-MOE_ALL$, which produces a weighted sum across all experts. The final enriched embeddings from either variant are then compared via dot product to compute query-document relevance scores. The authors look to answer in the 3 following Research Questions (RQs) to evaluate their framework:
+
+\begin{itemize}
+    \item{\textbf{RQ1}}: How does SB-MOE compare, in terms of retrieval effectiveness, to the fine-tuned version of the underlying DRM? - The authors fine-tune each DRM as baseline experiments to compare to their model including SB-MoE (\textbf{\texttt{FINE-TUNED}}).
+    \item{\textbf{RQ2}}: To what extent can the observed performance gains be attributed to the learned gating function and to the experts’ ability to capture useful textual characteristics? - The authors employ enother baseline where they assign random weights to the gating function (\textbf{\texttt{RANDOM-GATE}}). 
+    \item{\textbf{RQ3}}: Can SB-MOE generalize well across multiple domains and tasks without additional fine-tuning? - The authors fine-tune all 4 DRMs on the MSMARCO dataset, which is widely adopted for zero-shot evaluation.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/SB_MoE_Architecture.png}
+    \caption{SB-MoE Architecture Overview}
+\end{figure}
+
+\subsubsection{Results}
+The results demonstrate that SB-MOE delivers its most consistent and meaningful performance when integrated with lightweight base models, TinyBERT and BERT-Small, where it outperforms standard fine-tuning across both in-domain benchmarks and zero-shot evaluation on BEIR datasets. For larger models 
+like BERT-Base and Contriever, the benefits are considerably less obvious, suggesting that models already rich in parameters leave little room for the additional expert layers to contribute meaningfully. Regarding the number of experts, the hyperparameter analysis reveals that no single configuration consistently dominates across all datasets
+and metrics — while 6 experts was the default used throughout the main experiments, configurations with as few as 3 experts often performed competitively, and increasing beyond 6 did not reliably yield further gains. Finally, an extra analysis on the number of experts activated was performed. Despite configuring the model with up to 12 experts, only a subset of them — never more than 7 — were actually activated during inference 
+across any collection. Notably, the 3-expert configuration achieves 100\% activation across all evaluated corpora, suggesting that a compact expert pool can be both fully utilized and effective, making SB-MOE an appealing choice for resource-constrained settings where efficiency is as important as retrieval performance.
+
+\subsection{Multitask Learning for Sentiment and Emotion Analysis using resource constrained MobileBERT and DistilBERT}
+
+As emotional recognition and sentiment analysis are emerging trend in the field of Natural Language Processing (NLP), and especially the task of calssifying both of them in a sentence (very crucial in the contemporary age for multiple tasks such as social media monitoring), the authors of this paper propose a refined framework that balances both high scores in metrics and low computational requirements.
+To achieve that, lightweight transformers were used. The two kinds of lightweight transformers are (i) \textbf{Mobile Bidirectional Encoder Representations from Transformers (MobileBERT)} and (ii) \textbf{Distilled BERT (DistilBERT)}. Even though traditional methods to classify emotion recognition and sentiment analysis focus on single-task learning approaches, the authors adopt the idea of \textbf{multi-task learning} (training both tasks jointly), 
+due to the fact that both tasks are closely related. In that manner, the sharing of overlapping features, contexts and semantic nuances allows the entire pipeline to perform better than it would have if we have focused on single-task learning. Let's dive deeper in the architecture of the pipeline.
+
+\subsubsection{Pipeline Architecture}
+The pipeline's architecture follows some finite steps that allows the model to perform emotional recognition and sentiment analysis using lightweight NLP models. These steps are:
+
+\begin{itemize}
+    \item{\textbf{Text Input}}: We begin with sampling the data that are going to be used for input in our framework.
+    \item {\textbf{Data Augmentation}}: Data Augmentation is applied through random word deletion to introduce variability into training data, therefore enhancing model generalization and robustness.
+    \item {\textbf{Lightweight Transformer Models}}: The next step focuses on our data being passed through MobileBERT and DistilBERT. Both models have a tradeoff between hitting high metric scores and parameter number. As we are going to discuss in the results section below, DistilBERT supposedly has better results compared to MobileBERT due to higher paramemter count and therefore higher computational intensity and MobileBERT hits more modest results, 
+        but with much higher efficiency on realtime inference, which makes it more suitable for deployment as an edge device (e.g. mobile phone).
+    \item{\textbf{Prototypical Networks}}: Protoypical Networks are used for metric-based classification for few-shot tasks. They work by computing a center for each class in the embedding space and when it is time to classify an item, in our case an utterance, the eulidean distance between the utterance and the prototypes center is being computed. Of course, the class with the smaller distance is selected for prediction. This approach is robust for class-imbalanced datasets as
+        prototypes adapt dynamically to the class distribution and ensure discriminative embeddings. The formula used to compute Protoypical Network loss is $L_{\mathrm{proto}} = \frac{1}{N} \sum_{i=1}^{N} d\!\left(f(x_i), \mu_{y_i}\right)$ and it ensures the tight clustering of the utterance embeddings around around the class prototypes.
+    \item{\textbf{Focal Weighted Loss Function}}: In another attempt to mitigate the class imbalance in the dataset, the focal weighted loss function is introduced. It introduces a modulating factor that adjusts depending on the difficulty of prediction for each class. It is computed using the formula $FL(p_t) = -\alpha_t (1 - p_t)^{\gamma} \log(p_t)$, where p\_t is the model's predicted probability for the correct class, a\_t is a weight assigned to a class t depending on the class' difficulty to be predicted
+        and γ is a modulating factor, so the model will learn to focus on more difficult-to-classify examples. The final loss function is a weighted combination od focal weighted loss and protoypical network loss functions for both tasks.
+    \item{\textbf{Shared Layers and Task-Specific Layers}}: Last but not least, the pipeline employs shared layers for leveraging common patters and detecting shared relation between the 2 tasks and task-specific layers for each task specifically. The former consists of transformer layers from our lightweight transformer models, while the latter of fully connected layers. Finally, Multi-Head attention is used to help the model focus better on emotinally-heavy part of a sentence, while cross-attention helps enabling
+        the interaction between the two tasks.
+\end{itemize}
+
+\subsubsection{Results and Ablation Study}
+The proposed framework achieved strong results on both benchmark datasets (MELD and IEMOCAP).The proposed framework achieved strong results on both benchmark datasets. DistilBERT reached 81\% weighted F1 for emotion and 77\% for sentiment on MELD, and 77\%/79\% on IEMOCAP. MobileBERT scored lower overall but remained competitive given its much smaller footprint, making it the better fit for truly resource-constrained deployments.
+The ablation study broke down how much each component contributed. Removing the prototypical networks caused the steepest performance drop — 15 to 18 percentage points — confirming they're the backbone of the approach, particularly for handling imbalanced classes. Dropping the focal weighted loss cost around 4–5 points, showing it plays a meaningful but secondary role in pushing the model to focus on harder, minority-class examples. 
+Data augmentation via random word deletion had the smallest impact, trimming only about 3 points when removed, though it still provided consistent gains across the board. The takeaway is clear: all three components work together, but the prototypical network is by far the most critical piece.
 
 \clearpage
 % --- BIBLIOGRAPHY SECTION ---
