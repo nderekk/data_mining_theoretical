@@ -1,0 +1,600 @@
+\documentclass[a4paper,12pt]{article}
+
+% Packages
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue,
+    urlcolor=cyan
+}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{titlesec}
+\geometry{margin=1in}
+\setstretch{1.5}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+\usepackage[greek,english]{babel}
+\usepackage{alphabeta}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\usepackage{minted}
+\usepackage[round]{natbib}
+\usepackage{xcolor,listings}
+\usepackage{textcomp}
+\lstset{upquote=true}
+\usepackage{courier}
+\lstset{
+showstringspaces = false,
+numbers = left,
+commentstyle = \color{green},
+keywordstyle = \color{blue},
+stringstyle = \color{black},
+rulecolor = \color{black},
+basicstyle = \small \ttfamily ,
+breaklines = true,
+numberstyle = \tiny,
+}
+
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+\include{titlepage}
+\newpage
+\tableofcontents
+
+\clearpage
+\section{Introduction}
+This report focuses on the study of the BERT Transformer architecture for deep language understanding. After a short description of the state of NLP around the time when Transformers came along and revolutionized the field, we continue with a brief overview of the original Transformer \citep{vaswani2017attention} and then summarize the BERT paper \citep{devlin2019bert} and its influence. We then focus on a number of State-Of-The-Art (SOTA) implementations utilizing BERT, covering their different approaches and philosophies. The report concludes with an extended literature review covering five additional papers that broaden the thematic and temporal scope of the core material.
+
+\section{The State of NLP in 2017}
+Prior to the introduction of the Transformer architecture, the prevailing paradigm in NLP relied almost exclusively on seq2seq models rooted in Recurrent Neural Networks (RNNs). While architectures such as LSTMs \citep{hochreiter1997long} and GRUs were designed to mitigate the vanishing gradient problem, several fundamental bottlenecks persisted.
+
+\subsection{Sequential Processing and Parallelization}
+The defining characteristic of RNNs is their sequential nature; they process tokens one by one, maintaining a hidden state $h_t$ that is dependent on the previous state $h_{t-1}$. This linear dependency creates a significant computational bottleneck, as it prevents parallelization during training. As datasets grew in the mid-2010s, the inability to leverage GPU hardware to its full extent became a primary constraint on model scaling.
+
+\subsection{The Long-Range Dependency Problem}
+Despite the memory gates in LSTMs, these models struggled to capture dependencies between words that were far apart in a sentence. The signal of a word at the beginning of a long sequence often became diluted by the time the model reached the end. This was largely a consequence of the \textit{representation bottleneck}, where the model attempted to compress the semantic information of an entire variable-length input sequence into a single fixed-length context vector. While early attention mechanisms \citep{bahdanau2014neural} were introduced to allow the decoder to ``look back'' at specific encoder states, they were still auxiliary components added onto an underlying recurrent structure.
+
+\subsection{Static vs. Contextual Embeddings}
+In 2017, the industry standard for word representation involved static embeddings such as Word2Vec or GloVe. These methods assigned a single fixed vector to each word (e.g., the word ``bank'' would have the same vector regardless of whether the context was financial or geographical). While contemporaneous models like ELMo began experimenting with context-sensitive representations using Bi-LSTMs, the field was ripe for a non-recurrent architecture that could process entire sequences bi-directionally and simultaneously. This vacuum set the stage for the ``Attention is All You Need'' paper, which proposed a radical departure: discarding recurrence entirely in favor of the Self-Attention mechanism.
+
+\section{The Transformer Revolution}
+In 2017, Vaswani et al. published ``Attention Is All You Need'', proposing an architecture that discarded recurrence and convolution entirely in favor of a mechanism known as \textit{Self-Attention}. This shift allowed for unprecedented parallelization and solved the long-range dependency issues that had plagued the field.
+
+\subsection{The Core Architecture}
+The original Transformer was built to solve Machine Translation. Its architecture consisted of two parts: an encoder stack and a decoder stack.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{img/transformer_architecture_high.png}
+    \caption{High level view of the Transformer architecture}
+    \label{fig:transformer_high}
+\end{figure}
+
+In the original paper, both the encoder and decoder stacks consisted of six identical modules stacked on top of each other. Each encoder consists of two layers: a Self-Attention layer and a feed-forward network, both wrapped in residual connections and followed by layer normalization. Each decoder consists of three layers: a masked self-attention layer, an encoder-decoder attention layer, and a feed-forward network, similarly wrapped in residual connections and layer normalization.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{img/enc_dec_layers.png}
+    \caption{Module Internal Structure}
+    \label{fig:enc_dec}
+\end{figure}
+
+\subsubsection{Self-Attention}
+The self-attention mechanism allows the model to directly attend to all positions in the input sequence simultaneously, regardless of their distance from each other. This is achieved by computing attention weights that determine how much each token should attend to every other token when generating its representation.
+
+For each input token, three vectors are derived by multiplying the input embedding by learned weight matrices: the Query ($Q$), Key ($K$), and Value ($V$) vectors. The attention score between two tokens is the dot product of their query and key vectors, scaled by $\frac{1}{\sqrt{d_k}}$ to prevent vanishing gradients for large key dimensions. A softmax is then applied to obtain normalized attention weights, and the output is a weighted sum of value vectors:
+
+\begin{equation}
+    Z = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+
+where $Z$ is the output of the self-attention layer, with each row representing the new contextual representation of a token.
+
+\subsubsection{Multi-Headed Attention}
+The Transformer extends Scaled Dot-Product Attention to ``Multi-Head Attention'' by running $h$ attention operations in parallel, each with its own learned $Q$, $K$, $V$ projection matrices. This allows the model to attend to information from different representation subspaces at different positions simultaneously. The outputs of all heads are concatenated and projected via a weight matrix $W^O$ to produce the final output.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/multihead.png}
+    \label{fig:multihead}
+\end{figure}
+
+\subsubsection{The Decoder}
+The decoder uses the same architecture as the encoder, but with an additional encoder-decoder attention layer that creates its Queries from the layer below and takes Keys and Values from the output of the encoder stack. The self-attention layer in the decoder is masked, preventing each position from attending to future positions in the output sequence.
+
+\subsection{The intuition behind Self-Attention}
+The elegance of the $Q$, $K$, $V$ decomposition lies in how naturally it captures contextual meaning. The query vector represents what a token is ``asking'' of its context, the key vector represents what each token ``offers'' to others, and the value vector carries the actual information that gets weighted and aggregated. For the token ``bank'' in ``I went to the bank to withdraw money'', the query vector learns to ask for financial context; in ``The river bank was flooded'', it asks for geographical context. By the end of training, the attention mechanism has learned to route information precisely where it is needed.
+
+\subsection{Impact of the Transformer Paradigm}
+The introduction of the Transformer represented a seismic shift in NLP, with impact across three primary dimensions. First, by discarding the sequential dependency of RNNs, it enabled massive parallelization across GPU hardware, allowing models to scale to billions of parameters. Second, the self-attention mechanism established a direct, constant-time connection between all tokens in a sequence, producing more robust and stable semantic representations. Third, perhaps most significantly, it enabled the decoupling of pre-training from fine-tuning: a general-purpose backbone that learns universal linguistic features from unlabelled data, then specializes for diverse downstream tasks.
+
+\section{Bidirectional Encoder Representations from Transformers (BERT)}
+Just a year after the Transformer paper, in 2018 Devlin et al. published ``BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding'' \citep{devlin2019bert}.
+
+\subsection{Previous Work and Major Concept}
+BERT synthesizes several prior ideas: the Transformer's encoder architecture, ELMo's bidirectional contextualized embeddings, ULMFiT's transfer learning approach, and OpenAI's masked prediction technique. By combining these, the authors proposed a framework whose experimental evaluation broke records across language understanding benchmarks at the time of publication.
+
+\subsection{Diving deeper into the BERT Framework and Architecture}
+BERT's architecture is a multi-layer bidirectional Transformer encoder, proposed in two sizes: \textbf{BERT Base} (comparable in size to the OpenAI Transformer) and \textbf{BERT Large} (a larger model targeting state-of-the-art results).
+
+For every input token sequence, the first token is always the special \textbf{[CLS]} token, used for sentence classification tasks. The special \textbf{[SEP]} token separates two distinct sequences for two-sentence tasks. Each position outputs a vector; for classification tasks, the vector at the \textbf{[CLS]} position is passed through a classifier to produce the final output.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/BERT_input_output.png}
+    \caption{BERT's Input and Output Representations}
+    \label{fig:bert_io}
+\end{figure}
+
+\subsubsection{Pre-Training}
+The model is trained on large amounts of unlabeled data using \textbf{Masked Language Modeling (MLM)}: 15\% of tokens are randomly selected for masking. Of these, 80\% are replaced with the special \textbf{[MASK]} token, 10\% with a random token, and 10\% remain unchanged. This breakdown prevents a train-test mismatch, since the \textbf{[MASK]} token never appears during fine-tuning.
+
+\subsubsection{Fine-Tuning}
+With pre-trained parameters in place, task-specific inputs and outputs are plugged in and all parameters are fine-tuned end-to-end. BERT can be adapted to sentence pair classification, single sentence classification, question answering, and sequence tagging tasks, as shown in Figure \ref{fig:bert_downstream}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/BERT_downstream_tasks.png}
+    \caption{Various Downstream Tasks for Fine-Tuning with BERT}
+    \label{fig:bert_downstream}
+\end{figure}
+
+\section{TSAPM-BERT: Parametric Refinement for Emotion Prediction}
+\label{sec:tsapm}
+
+\subsection{Beyond Sentiment: Mapping the Emotion Manifold}
+While traditional sentiment analysis focuses on binary or ternary polarity classification \citep{kayal2026parametrically}, emotion detection seeks higher granularity by identifying specific affective states. The TSAPM-BERT framework operates on a six-class emotion space: \textit{Sadness, Anger, Fear, Joy, Love,} and \textit{Surprise}. In a standard BERT embedding space, these emotions frequently overlap due to shared semantic contexts. TSAPM-BERT addresses this by using parametric modifications to warp the latent space, creating clearer boundaries between nuanced emotional states. By mapping the six classes to binary labels (Joy, Love, Surprise $\to$ 1; Sadness, Anger, Fear $\to$ 0), the authors also demonstrate that high emotional granularity is inherently beneficial for basic sentiment tasks.
+
+\subsection{Architectural Modification: The $\alpha$ and $\beta$ Parameters}
+To enhance the model's focus on emotionally charged vocabulary, the paper proposes modifications to BERT's attention formula ($A$) and hidden state formula ($H$), injecting information from external sentiment lexicons such as SentiWordNet. While lexicon-based approaches are not novel in themselves, their injection at the parameter level is, as most prior work incorporates them only at the auxiliary level.
+
+\subsubsection{Parametric Attention Modification ($\alpha$)}
+The authors modify the attention formula as follows:
+
+\begin{equation}
+    A' = \alpha A_{std} + (1 - \alpha)A_{sent}
+\end{equation}
+
+where $A_{std}$ is the original BERT attention, $A_{sent}$ is sentiment-weighted attention derived from polarity scores, and $\alpha \in [0, 1]$ is a fixed hyperparameter controlling the balance between the two. This ensures that sentiment-bearing tokens are attended to proportionally more than standard tokens during encoding, while preserving BERT's learned contextual dependencies.
+
+\subsubsection{Lexicon-Guided Latent Representations ($\beta$)}
+The $\beta$ parameter is a \textit{learnable weight} optimized during fine-tuning. It governs the integration of a sentiment lexicon vector $S_{lex}$ into BERT's hidden states:
+
+\begin{equation}
+    H' = H_{std} + \beta \cdot S_{lex}
+\end{equation}
+
+$S_{lex}$ is a fixed-dimensional vector constructed by mapping per-token polarity scores from SentiWordNet into BERT's hidden state dimension. This vector is injected after the initial embedding layer but before the first Transformer block, effectively giving the model an explicit hint about each token's emotional weight before self-attention begins. Through the optimization of $\beta$, the model dynamically learns the optimal injection strength.
+
+\subsection{Training Protocol and Results}
+Fine-tuning used a selective optimization strategy, updating only attention, feed-forward, and embedding layers rather than all weights uniformly, to preserve pre-trained linguistic knowledge. Key hyperparameters are summarized in Table \ref{tab:hyperparameters}.
+
+\begin{table}[H]
+\centering
+\caption{TSAPM-BERT Hyperparameter Settings}
+\label{tab:hyperparameters}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\ \hline
+Learning Rate           & $2 \times 10^{-5}$ \\ \hline
+Dropout Rate            & 0.3 \\ \hline
+Batch Size              & 32 \\ \hline
+Number of Epochs        & 5 \\ \hline
+Optimizer               & AdamW  \\ \hline
+Max Sequence Length     & 128 tokens  \\ \hline
+Warmup Steps            & 500  \\ \hline
+Weight Decay            & 0.01  \\ \hline
+\end{tabular}
+\end{table}
+
+The model was trained and evaluated on an 18,000-row emotion dataset with six classes, using a 70/10/20 train/validation/test split and 5-fold cross-validation. TSAPM-BERT achieved 99.37\% training accuracy and 98.52\% testing accuracy, with a minimal overfitting gap of 0.85\%. It also outperformed other SOTA BERT models on the CARER dataset across all reported metrics.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/acc.png}
+    \caption{Performance metrics across baselines}
+\end{figure}
+
+\subsection{Ablation Analysis}
+The ablation study systematically removed each parametric component to quantify its contribution. Results are summarized in Table \ref{tab:ablation}. Removing the sentiment lexicon ($\beta = 0$) degraded performance across all classes, confirming that BERT alone lacks explicit emotional polarity sensitivity. Disabling weighted attention ($\alpha = 1$) caused the most significant drops in minority class recall, as the model reverted to uniform attention distribution. The largest degradation occurred when both $\alpha$ and $\beta$ were removed entirely and uniform fine-tuning was applied, which also significantly increased the overfitting gap, validating the regularizing effect of parametric control.
+
+\begin{table}[h]
+\centering
+\caption{Summary of Ablation Study Impacts}
+\label{tab:ablation}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Setting Removed} & \textbf{Primary Consequence} \\ \hline
+Sentiment Lexicon ($S_{lex}$) & Loss of sensitivity to emotional polarity  \\ \hline
+Weighted Attention ($\alpha$) & Focus dilution; drop in minority class F1-scores \\ \hline
+Parametric Control ($\alpha, \beta$) & Largest accuracy drop; increased overfitting gap \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Critical Analysis: Benchmarking and Domain Constraints}
+While the 98.52\% testing accuracy is numerically impressive, a critical review reveals a significant methodological limitation. The most recent direct comparison on the CARER dataset dates to 2018 \citep{saravia2018carer}, while SOTA comparisons from 2024--2025 use disparate datasets such as the ``Restaurant'' domain \citep{zhao2025aspect}. Because emotional manifolds vary drastically across domains, these cross-dataset comparisons lack the rigor required for a definitive claim of global superiority. The model's universal applicability across domains and languages remains empirically unvalidated.
+
+\clearpage
+\section{RexBERT: Domain Specialization through Data Curation}
+\label{sec:rexbert}
+
+\subsection{Motivation: The E-commerce Domain Gap}
+While general-purpose encoders like BERT and ModernBERT \citep{warner2025smarter} provide robust linguistic foundations, they struggle with the unique properties of the e-commerce domain: high entity density, semi-structured attribute-value pairs, and complex polysemy where product substitutes and complements must be mathematically distinguished. RexBERT bridges this gap by prioritizing high-quality in-domain data and a principled training curriculum over indiscriminate parameter scaling.
+
+\subsection{The Ecom-niverse Corpus}
+The primary asset enabling RexBERT's specialization is \textit{Ecom-niverse}, a curated 350-billion-token corpus derived from the 4.4-trillion-token FineFineWeb collection. To isolate commerce-relevant text, the authors employ a modular curation pipeline: domain-relevant categories are identified and split into ``Directly Selected'' (e.g., Fashion/Beauty at 15.3\%) and ``Filter Required'' (e.g., News at 12.7\%, Health at 8.9\%). For both groups, the pipeline samples representative subsets, uses a smaller instruction-tuned model (Phi-4) to assign binary relevance labels audited by a stronger model (Llama3-70B), distills these labels into lightweight fastText classifiers, validates each classifier with held-out evaluation, and applies them at scale to filter the full corpus.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{img/rex_cleaning_pipeline.png}
+    \caption{Ecom-niverse curation pipeline}
+    \label{fig:rex_pipeline}
+\end{figure}
+
+\subsection{Architectural Foundation: ModernBERT Integration}
+RexBERT builds on the ModernBERT architecture \citep{warner2025smarter}, incorporating several key enhancements over original BERT. Bias terms are removed from linear layers and Post-Layer Normalization is replaced with Pre-Norm, providing a more stable gradient highway for deeper architectures. Absolute positional embeddings are replaced with Rotary Positional Embeddings (RoPE), enabling natural generalization to longer sequences. Standard GELU activations are replaced with GeGLU, providing a more expressive latent space. To handle 8,192-token sequences efficiently, the model alternates between local sliding-window attention and full global attention layers, reducing the quadratic $O(N^2)$ complexity of standard attention. Finally, unpadding strips padding tokens before processing and Flash Attention accelerates the attention kernel, together achieving substantially higher GPU throughput.
+
+\subsection{Three-Phase Pre-training and Guided MLM}
+RexBERT avoids from-scratch domain training through a three-phase curriculum. Phase 1 (1.7T tokens) establishes general linguistic foundations on web text, code, and multilingual papers at 512-token sequences. Phase 2 (250B tokens) extends the context window to 8,192 tokens. Phase 3 (350B tokens) anneals the model onto Ecom-niverse, gradually shifting the sampling distribution toward retail-specific data.
+
+During Phase 3, RexBERT introduces \textit{Guided MLM}: rather than masking tokens randomly, the pipeline preferentially masks domain-relevant spans such as brand names, technical specifications, and product attributes. To preserve general NLU performance, Guided MLM sequences account for only 5\% of each training batch, with the remaining 95\% following standard random masking.
+
+\subsection{Evaluation: Benchmarks and Pareto Efficiency}
+
+\begin{table}[h]
+\centering
+\caption{Comparative performance on e-commerce and general benchmarks.}
+\label{tab:rexbert_results}
+\begin{tabular}{lccc}
+\hline
+\textbf{Model} & \textbf{Params} & \textbf{ESCI-token (Avg k=1,3,5)} & \textbf{GLUE (Avg)} \\ \hline
+RexBERT-Mini & 68M & 77.52 & 89.31 \\
+ModernBERT-Base & 149M & 75.13 & 89.90 \\
+\textbf{RexBERT-Base} & \textbf{150M} & \textbf{81.22} & \textbf{90.62} \\
+ModernBERT-Large & 395M & 78.91 & 92.54 \\
+\textbf{RexBERT-Large} & \textbf{400M} & \textbf{83.67} & \textbf{92.69} \\ \hline
+\end{tabular}
+\end{table}
+
+RexBERT-Mini (68M parameters) outperforms ModernBERT-Base (149M) on the Amazon ESCI benchmark, confirming that a smaller model trained on high-quality domain-specific data can outweigh a larger generalist model. Despite its specialization, RexBERT maintains competitive GLUE performance, attributed to the 5\% Guided MLM mixture and the phased curriculum, which prevent catastrophic forgetting of general linguistic structure.
+
+\section{Multitask Learning and BERT Embedding for Subjectivity Detection and Aspect-Based Sentiment Analysis}
+
+\subsection{Motivation}
+Online reviews are the primary channel of feedback between merchants and clients, but their sheer volume makes manual analysis impractical. Sentence-level sentiment analysis is insufficient because it misses the aspect-level structure of how customers actually evaluate products. \textbf{Aspect-Based Sentiment Analysis (ABSA)} addresses this by classifying sentiment with respect to specific product aspects. The authors augment ABSA with \textbf{Subjectivity Detection (SD)} as an auxiliary task, filtering out objective statements (e.g., ``The screen is 7.9 inches'') before assigning fine-grained sentiment to subjective ones (e.g., ``I love its bright green color''). By training both tasks jointly in a \textbf{Multitask Learning (MTL)} framework, the model learns shared representations that improve generalization over single-task approaches.
+
+\subsection{ABSA Task Taxonomy}
+The paper formalizes ABSA around four single tasks, Aspect Term Extraction (ATE), Aspect Category Detection (ACD), Opinion Term Extraction (OTE), and Aspect Sentiment Classification (ASC), which combine into compound tasks as shown in Figure \ref{fig:absa_tasks}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/ABSA_tasks.png}
+    \caption{Single and Compound ABSA Tasks}
+    \label{fig:absa_tasks}
+\end{figure}
+
+The primary task studied is ASC: given a sentence $S = \{w_1, \ldots, w_n\}$ and an aspect term $a = \{w_i, \ldots, w_j\}$, predict the sentiment polarity $y \in \{\text{positive, neutral, negative}\}$. The auxiliary SD task assigns a binary label $z \in \{0, 1\}$ (objective/subjective) to the same aspect term.
+
+\subsection{SMABSA Framework Architecture}
+The Subjectivity Multitask Aspect-Based Sentiment Analysis (SMABSA) framework stacks the following components:
+
+\subsubsection{Shared Embedding Layer and Bi-LSTM Networks}
+Input sentences and aspect terms are tokenized with WordPiece and encoded by BERT Base to produce contextualized embeddings $H = \{h_0, h_1, \ldots, h_n\}$. These are fed into two separate Bi-LSTM networks, one per task, capturing both forward and backward contextual dependencies:
+
+\begin{align}
+h_t^{\text{forward}} &= \mathrm{LSTM}_{\text{forward}}(h_t, h_{t-1}^{\text{forward}}) \\
+h_t^{\text{backward}} &= \mathrm{LSTM}_{\text{backward}}(h_t, h_{t+1}^{\text{backward}}) \\
+h_t^{\text{BiLSTM}} &= \left[ h_t^{\text{forward}} \,;\, h_t^{\text{backward}} \right]
+\end{align}
+
+\subsubsection{Self-Attention, NTN, and Classification}
+A self-attention layer computes weighted token representations to highlight classification-relevant words:
+\begin{align}
+\alpha &= \mathrm{softmax}\left(W_b^{T} \cdot \tanh\left(W_a \cdot H\right)\right), \quad v = \alpha \cdot H^{T}
+\end{align}
+
+The weighted representations are fed into a Neural Tensor Network (NTN), the heart of the multitask framework, which models complex interactions between the two task-specific representations via a bilinear tensor transformation:
+\begin{align}
+v_{\text{NTN}} &= \tanh\left((v_{\text{subj}} \oplus v_{\text{asc}}) W + v_{\text{subj}}^{T} \cdot G \cdot v_{\text{asc}} + b \right)
+\end{align}
+
+Two classification heads follow: SD uses the self-attention output through a softmax layer; ASC concatenates the NTN output with the self-attention output before its softmax. The total training loss is the sum of the categorical cross-entropy losses of both tasks:
+\begin{align}
+\mathcal{L}_{\text{total}} &= \mathcal{L}_{\text{ABSA}} + \mathcal{L}_{\text{SD}}
+\end{align}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{img/SMABSA_architecture.png}
+    \caption{Abstract Architecture Schema for SMABSA}
+    \label{fig:smabsa}
+\end{figure}
+
+\subsection{Ablation Study}
+The ablation study confirms the framework's core hypothesis: removing the SD component produces the largest performance degradation, with an F1-score drop of over 17 percentage points, validating that subjectivity detection meaningfully improves aspect sentiment classification.
+
+\begin{table}[htpb]
+\centering
+\begin{tabular}{lll}
+\toprule
+Model variant & Accuracy (\%) & F1-score (\%) \\
+\midrule
+SMABSA (full model) & 88.15 & 87.26 \\
+w/o Subjectivity detection (SD) & 83.92 & 69.81 \\
+w/o Bi-LSTM & 86.45 & 85.53 \\
+w/o Self-attention & 86.88 & 85.99 \\
+w/o NTN (using concatenation) & 87.21 & 86.34 \\
+\bottomrule
+\end{tabular}
+\caption{Ablation study results}
+\label{tab:ablation_SMABSA}
+\end{table}
+
+\section{Domain-Adaptive PreTraining for Occupational Safety Applications}
+
+\subsection{Overview}
+Occupational safety remains a persistent global challenge, with the richest data source being unstructured accident narratives rather than structured datasets. This study applies \textbf{Domain-Adaptive PreTraining (DAPT)}, an additional round of pre-training on domain-specific text, to both BERT and ALBERT, producing \textbf{safetyBERT} and \textbf{safetyALBERT}. The central premise is that continued pre-training on occupational safety corpora gives these models contextual understanding of domain-specific terminology that general pre-training cannot provide.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{img/DAPT_framework.png}
+    \caption{Framework Overview}
+    \label{fig:dapt_framework}
+\end{figure}
+
+\subsection{Multi-Source Domain Corpus Development}
+The DAPT training corpus aggregates data from seven sources across academic literature, regulatory agencies (MSHA, OSHA, IOGP), and industrial organizations, using an Academic Abstract Collection Framework and an Accident Narrative Collection Framework. The result is a corpus balanced between technical terminology and practical accident language.
+
+To prepare the corpus for training, BERT uses WordPiece tokenization and ALBERT uses SentencePiece. Sequences exceeding the 512-token context limit are handled via overlapping chunking with a predefined stride. For computational efficiency, sequences are grouped into length-based buckets and padded to the longest sequence within each bucket. Source imbalance across the seven data sources is mitigated via inverse-frequency weighted sampling:
+
+\begin{align}
+\omega_s = \frac{N_{\text{total}}}{N_s}, \quad P(x_i) \propto \omega_{s(i)}
+\end{align}
+
+ensuring equal representation of each source during training.
+
+\subsection{Domain-Adaptive PreTraining}
+DAPT uses Masked Language Modeling only, omitting Next Sentence Prediction due to its documented inefficiency. Input embeddings aggregate token, segment, and position embeddings; BERT uses full 768-dimensional embeddings while ALBERT uses a factorized 128-dimensional approach projected back to 768. Tokens are dynamically masked and predicted using the cross-entropy loss:
+
+\begin{align}
+L_{\text{MLM}} = - \sum \log P(w_i \mid \tilde{w})
+\end{align}
+
+minimized with AdamW with linear warmup and decay. Domain adaptation quality is assessed intrinsically via word-normalized Pseudo-Perplexity (PPPL$_w$) and extrinsically via weighted F1 on downstream classification tasks.
+
+\subsection{Downstream Fine-Tuning}
+The domain-adapted models are fine-tuned on MSHA Accident Narratives (January 2022 to February 2025) for classification of accident type (9 classes), mining equipment (8 classes), and degree of injury. A secondary evaluation uses Alaska mining injury insurance claims for claim type and injured body part classification. Both single-task and multi-task learning approaches are evaluated, with the multi-task variant using a shared transformer encoder with equal loss weighting across tasks. Hyperparameters are selected via grid search with n-fold cross-validation.
+
+\clearpage
+\section{Extended Literature Review}
+
+\subsection{Representation Learning: Matryoshka Representation Learning}
+
+An implicit assumption underlying most embedding-based systems is that all downstream
+tasks require the same representational capacity. In practice, however, a coarse
+document retrieval task and a fine-grained semantic similarity task have fundamentally
+different precision requirements, yet both are typically served by the same
+fixed-dimensional embedding vector. This rigidity forces practitioners into an
+uncomfortable tradeoff: train a large, expensive embedding model for maximum accuracy,
+or train a smaller, faster one and accept a performance penalty. \citet{kusupati2022matryoshka}
+address this limitation directly with \textit{Matryoshka Representation Learning} (MRL).
+
+The core insight of MRL is deceptively simple: rather than optimizing a model to
+produce a single fixed-size embedding, train it such that the first $m$ dimensions
+of the output vector are independently meaningful for every $m$ in a chosen set
+$\mathcal{M} = \{8, 16, 32, 64, \ldots, d\}$. This is achieved by modifying the
+training loss to be a weighted sum of losses computed at each target dimensionality:
+
+\begin{equation}
+    \min_{\{\mathbf{W}^{(m)}\}_{m \in \mathcal{M}},\, \theta_F}
+    \frac{1}{N} \sum_{i \in [N]} \sum_{m \in \mathcal{M}}
+    c_m \cdot \mathcal{L}\!\left(\mathbf{W}^{(m)} \cdot F(x_i; \theta_F)_{1:m};\, y_i\right)
+\end{equation}
+
+where $c_m$ is a scalar weight controlling the relative importance of each
+dimensionality during training, $\mathbf{W}^{(m)}$ is a learned linear layer
+that projects the first $m$ dimensions of the embedding into the classification
+space, and $\mathcal{L}$ is the multi-class softmax cross-entropy loss computed
+against the ground truth label $y_i$. The rest of the training pipeline remains
+unchanged, MRL is a modification of the loss function, not the architecture.
+
+The authors also propose \textit{MRL-E} (Efficient MRL), which eliminates the need
+for separate linear projection layers per dimensionality. Instead of projecting the
+full representation down to $m$ dimensions via learned weight matrices $W_m$, MRL-E
+simply truncates the embedding vector at position $m$ directly. This means the
+overhead of MRL-E over standard embedding training is negligible, as no additional
+parameters or projection steps are introduced.
+
+The key empirical finding is that MRL embeddings, when truncated to $m$ dimensions,
+achieve approximately 97--99\% of the performance of a dedicated model independently
+trained at that same dimensionality $m$. Critically, this holds across a single
+model, meaning one MRL-trained model can replace an entire family of fixed-size
+embedding models without retraining. This was validated across large-scale
+classification and retrieval benchmarks, where lower-dimensional MRL embeddings
+matched the accuracy of their dedicated counterparts while offering substantial
+reductions in inference latency and memory footprint.
+
+The authors draw an analogy to the brain's natural coarse-to-fine processing
+hierarchy, where rough semantic distinctions are established before fine-grained
+details are resolved. MRL operationalizes this principle in the embedding space: the
+early dimensions capture the most salient semantic structure, with subsequent
+dimensions progressively refining the representation. Notably, this property
+generalizes to intermediate dimensionalities not explicitly included in $\mathcal{M}$
+during training, suggesting that the learned representations are smoothly structured
+rather than discretely partitioned.
+
+The relevance of MRL to the broader themes of this report is direct. RexBERT's
+evaluation on retrieval benchmarks such as ESCI implicitly relies on the assumption
+that embedding dimensionality is fixed at inference time. MRL challenges this
+assumption, offering a principled framework for adaptive-precision retrieval that
+could be applied on top of any encoder, including the domain-specialized encoders
+explored in this report.
+
+\subsection{Catastrophic Forgetting in Large Language Models}
+
+Catastrophic forgetting refers to the tendency of neural networks to lose previously
+acquired capabilities when fine-tuned on new tasks sequentially, without access to
+prior training data. While this phenomenon has been documented empirically across
+many model families, the internal mechanisms driving it in large transformer-based
+models remained poorly understood. \citet{imanov2026mechanistic} address this gap
+with a systematic mechanistic analysis of catastrophic forgetting during sequential
+fine-tuning, studying six contemporary LLM architectures spanning 109B to 1.5T
+parameters across twelve task sequences of varying inter-task similarity.
+
+The study identifies three primary mechanisms that collectively drive forgetting,
+each operating at a distinct architectural level and timescale.
+
+\textbf{Attention Mechanism Disruption.} The first and earliest mechanism involves
+the disruption of attention heads in the lower layers of the network. When attention
+weights were frozen during fine-tuning, forgetting was reduced by 64 percent compared
+to full fine-tuning, establishing attention mechanisms as the primary driver of
+early-stage forgetting. Approximately 15 to 23 percent of attention heads across all
+layers underwent severe reorganization, defined as weight changes exceeding 2.5
+standard deviations from the mean. Critically, of these severely disrupted heads,
+only 31 percent showed high activation levels when processing new task data, indicating
+that fine-tuning is largely non-selective, disrupting many heads that play no role
+in acquiring the new capability. This was confirmed causally by an ablation
+experiment: restoring the 20 percent most disrupted heads to their pre-fine-tuning
+state recovered 47 percent of lost performance on the original task while degrading
+new task performance by only 8 percent. The asymmetry of this result confirms that
+the fine-tuning process overwrites task-irrelevant attention circuits as collateral
+damage rather than targeting specific parameters.
+
+\textbf{Representational Drift in Intermediate Layers.} The second mechanism
+operates at the level of hidden representations in the intermediate layers of the
+model. Using Centered Kernel Alignment (CKA), a metric measuring representational
+similarity before and after fine-tuning, the authors found that intermediate layers
+(layers 8 to 16 in 24-layer architectures) exhibited the largest drift, with CKA
+scores decreasing by 0.32 to 0.47 on a 0 to 1 scale. Principal component analysis
+revealed that the leading components, accounting for 60 to 75 percent of
+representational variance, rotated by 35 to 52 degrees on average during fine-tuning,
+while higher-order components remained relatively stable. This suggests fine-tuning
+preferentially disrupts the dominant, most general representational structure of the
+model rather than its more granular, task-specific features. Notably, drift magnitude
+showed no significant correlation with task-relevance of individual dimensions
+(Pearson $r = 0.12$, $p = 0.24$), confirming that representational drift is
+indiscriminate. A realignment intervention that restored intermediate representations
+to their pre-fine-tuning geometry recovered 38 percent of lost task performance with
+only 6 percent degradation on the new task.
+
+\textbf{Gradient Interference.} The third mechanism concerns the optimization
+dynamics during sequential fine-tuning. For any two tasks, one can compute the
+cosine similarity between their respective gradient vectors in parameter space, that
+is, the degree to which the two tasks pull the model's parameters in compatible or
+conflicting directions. The authors find that when gradient cosine similarity falls
+below $-0.3$, indicating substantial conflict, forgetting rates increase by 2.4 times
+compared to conditions of positive gradient alignment. Interference localized
+disproportionately to the query and key projection matrices of the attention layers,
+with 67 percent of these parameters experiencing gradient conflicts, compared to
+34 percent for value projections and 29 percent for feedforward weights. Importantly,
+gradient alignment measured during the very first epoch of fine-tuning, before any
+observable accuracy degradation, already predicted final forgetting magnitude with
+$r = -0.79$ ($p < 0.001$), establishing gradient interference as a practical early
+warning signal for catastrophic forgetting.
+
+\textbf{Loss Landscape Flattening.} The fourth mechanism operates at the level of
+loss landscape geometry. After training on a task, the model resides in a sharp
+minimum in parameter space, characterized by high curvature and a strong restoring
+force that would pull the model back toward good performance if it drifts. Sequential
+fine-tuning progressively flattens this minimum: the maximum Hessian eigenvalue for
+the original task's loss function decreased from 147.3 at convergence to 34.2 after
+three subsequent tasks. As the landscape flattens, the restoring force disappears
+and forgetting becomes increasingly irreversible. Critically, this flattening was
+detectable 1 to 2 epochs before any observable accuracy drop, making it another
+prospective signature of impending forgetting.
+
+\textbf{Integrated Model and Implications.} These four mechanisms interact
+synergistically across different timescales. Gradient interference and attention
+disruption dominate in early epochs (1 to 2), representational drift accumulates
+progressively over epochs 3 to 5, and loss landscape flattening emerges as a
+longer-term consequence after epoch 4 or more. A combined intervention targeting
+both attention head restoration and representational realignment recovered 71 percent
+of original task performance, demonstrating that the mechanisms are partially
+independent and their effects additive.
+
+One counterintuitive finding is that higher inter-task similarity was associated with
+more severe forgetting in these experiments, not less. The authors attribute this to
+the fact that similar tasks produce gradients that appear globally aligned but
+introduce subtle, localized conflicts in specific parameter subsets, particularly the
+query and key projection matrices, creating a false impression of compatibility while
+damage accumulates in specific circuits.
+
+For the broader context of this report, these findings carry direct implications.
+All four assigned papers involve some form of continued pre-training or fine-tuning
+of BERT-based encoders, and the design choices made in each, such as RexBERT's
+phased training curriculum, safetyBERT's weighted corpus sampling, and TSAPM-BERT's
+selective layer freezing, can be understood as implicit mitigations of the mechanisms
+identified here. It is worth noting, however, that the paper's experimental scope
+is limited to decoder-only and mixture-of-experts architectures. Whether the same
+three mechanisms govern forgetting in encoder-only models like BERT remains an open
+question, and extending this mechanistic framework to encoders represents a natural
+direction for future work.
+
+\subsection{Encoder Architecture: ModernBERT}
+% TODO: Write ModernBERT content here
+
+\subsection{Mixture of Experts Approaches in Dense Retrieval Tasks}
+As it is known, the primary goal of Information Retrieval is to efficiently identify, rank and deliver the most relevant information from a large collection of data in response to a user's query. In the past, Sparse Retrieval Models (sparse-lexicon models) were used as a solution to IR's goal. Even though the keyword matching technique that SRMs supported between the user's query and the document made sense at first, its big gap was that such models were missing the semantic similarity between words or phrases. For example, if a user would search for `fast electric car' documents including exactly these words would be returned. However, documents containing information about `speedy EV', which semantically refer to the same topic as the user's query, would be missed. For that reason, Dense Retrieval Models (DRMs) were proposed. DRMs are based on the Transformer model, and more specifically on BERT, therefore allowing the networks to capture semantic meaning between query and document. DRMs map both queries and documents into the embedding space, where semantic similarity equals to geometric closeness and for that reason a similarity score is finally employed to assess the resemblance between query and document. A big problem that DRMs faced was generalization, as they perform really well on specific tasks they are fine tuned to but lack the ability of generalizing on larger domains. The authors propose a framework by employing a single block Mixture-of-Experts (SB-MoE) right after the final Transformer layer of the underlying DRMs.
+
+\subsubsection{Mixture-of-Experts Block}
+The SB-MoE added after the DRMs consists of multiple pairs of Feed-Forward Networks (FFNs), where each one is specialized in something different than the others (that's why they are called `experts'). After an input, a gating function (neural network which assigns a weight to each expert) determines how relevant each expert is to the input and along a pooling strategy, the final prediction of the model.
+
+\subsubsection{Architecture}
+SB-MoE builds on a standard bi-encoder architecture, where one of four underlying base models, Contriever (110M parameters), BERT-Base (110M), BERT-Small (29M), or TinyBERT (14.5M), independently encodes the query and document into dense vector embeddings.
+The SB-MoE is then appended after the final Transformer layer of whichever base model is used, acting on both the query and document embeddings simultaneously. The gating function, consisting of a single hidden layer that halves the vector dimension followed by an output layer sized to the number of experts, is trained end-to-end in an unsupervised manner alongside the underlying DRM and the experts themselves. Each expert follows the adapter architecture, with a down-projection layer that halves the input dimension and an up-projection that restores it, plus a skip connection for residual learning. At inference time, the model operates in one of two modes: $SB\text{-}MOE_{TOP\text{-}1}$, which selects only the expert assigned the highest gating score, or $SB\text{-}MOE_{ALL}$, which produces a weighted sum across all experts. The final enriched embeddings from either variant are then compared via dot product to compute query-document relevance scores. The authors look to answer the 3 following Research Questions (RQs) to evaluate their framework:
+
+\begin{itemize}
+    \item{\textbf{RQ1}}: How does SB-MOE compare, in terms of retrieval effectiveness, to the fine-tuned version of the underlying DRM?
+    \item{\textbf{RQ2}}: To what extent can the observed performance gains be attributed to the learned gating function and to the experts' ability to capture useful textual characteristics?
+    \item{\textbf{RQ3}}: Can SB-MOE generalize well across multiple domains and tasks without additional fine-tuning?
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/SB_MoE_Architecture.png}
+    \caption{SB-MoE Architecture Overview}
+\end{figure}
+
+\subsubsection{Results}
+The results demonstrate that SB-MOE delivers its most consistent and meaningful performance when integrated with lightweight base models, TinyBERT and BERT-Small, where it outperforms standard fine-tuning across both in-domain benchmarks and zero-shot evaluation on BEIR datasets. For larger models like BERT-Base and Contriever, the benefits are considerably less obvious, suggesting that models already rich in parameters leave little room for the additional expert layers to contribute meaningfully. Regarding the number of experts, the hyperparameter analysis reveals that no single configuration consistently dominates across all datasets and metrics. While 6 experts was the default used throughout the main experiments, configurations with as few as 3 experts often performed competitively, and increasing beyond 6 did not reliably yield further gains. Finally, an extra analysis on the number of experts activated was performed. Despite configuring the model with up to 12 experts, only a subset of them, never more than 7, were actually activated during inference across any collection. Notably, the 3-expert configuration achieves 100\% activation across all evaluated corpora, suggesting that a compact expert pool can be both fully utilized and effective, making SB-MOE an appealing choice for resource-constrained settings where efficiency is as important as retrieval performance.
+
+\subsection{Multitask Learning for Sentiment and Emotion Analysis using resource constrained MobileBERT and DistilBERT}
+
+As emotional recognition and sentiment analysis are emerging trends in the field of Natural Language Processing (NLP), and especially the task of classifying both of them in a sentence (very crucial in the contemporary age for multiple tasks such as social media monitoring), the authors of this paper propose a refined framework that balances both high scores in metrics and low computational requirements.
+To achieve that, lightweight transformers were used. The two kinds of lightweight transformers are (i) \textbf{Mobile Bidirectional Encoder Representations from Transformers (MobileBERT)} and (ii) \textbf{Distilled BERT (DistilBERT)}. Even though traditional methods to classify emotion recognition and sentiment analysis focus on single-task learning approaches, the authors adopt the idea of \textbf{multi-task learning} (training both tasks jointly),
+due to the fact that both tasks are closely related. In that manner, the sharing of overlapping features, contexts and semantic nuances allows the entire pipeline to perform better than it would have if we have focused on single-task learning.
+
+\subsubsection{Pipeline Architecture}
+The pipeline's architecture follows some finite steps that allows the model to perform emotional recognition and sentiment analysis using lightweight NLP models. These steps are:
+
+\begin{itemize}
+    \item{\textbf{Text Input}}: We begin with sampling the data that are going to be used for input in our framework.
+    \item {\textbf{Data Augmentation}}: Data Augmentation is applied through random word deletion to introduce variability into training data, therefore enhancing model generalization and robustness.
+    \item {\textbf{Lightweight Transformer Models}}: The next step focuses on our data being passed through MobileBERT and DistilBERT. Both models have a tradeoff between hitting high metric scores and parameter number. As we are going to discuss in the results section below, DistilBERT supposedly has better results compared to MobileBERT due to higher parameter count and therefore higher computational intensity and MobileBERT hits more modest results,
+        but with much higher efficiency on realtime inference, which makes it more suitable for deployment as an edge device (e.g. mobile phone).
+    \item{\textbf{Prototypical Networks}}: Prototypical Networks are used for metric-based classification for few-shot tasks. They work by computing a center for each class in the embedding space and when it is time to classify an item, in our case an utterance, the Euclidean distance between the utterance and the prototypes center is being computed. The class with the smaller distance is selected for prediction. This approach is robust for class-imbalanced datasets as
+        prototypes adapt dynamically to the class distribution and ensure discriminative embeddings. The formula used to compute Prototypical Network loss is $L_{\mathrm{proto}} = \frac{1}{N} \sum_{i=1}^{N} d\!\left(f(x_i), \mu_{y_i}\right)$ and it ensures the tight clustering of the utterance embeddings around the class prototypes.
+    \item{\textbf{Focal Weighted Loss Function}}: In another attempt to mitigate the class imbalance in the dataset, the focal weighted loss function is introduced. It introduces a modulating factor that adjusts depending on the difficulty of prediction for each class. It is computed using the formula $FL(p_t) = -\alpha_t (1 - p_t)^{\gamma} \log(p_t)$, where $p_t$ is the model's predicted probability for the correct class, $\alpha_t$ is a weight assigned to a class t depending on the class' difficulty to be predicted
+        and $\gamma$ is a modulating factor, so the model will learn to focus on more difficult-to-classify examples. The final loss function is a weighted combination of focal weighted loss and prototypical network loss functions for both tasks.
+    \item{\textbf{Shared Layers and Task-Specific Layers}}: The pipeline employs shared layers for leveraging common patterns and detecting shared relations between the 2 tasks and task-specific layers for each task specifically. The former consists of transformer layers from our lightweight transformer models, while the latter of fully connected layers. Finally, Multi-Head attention is used to help the model focus better on emotionally-heavy parts of a sentence, while cross-attention enables the interaction between the two tasks.
+\end{itemize}
+
+\subsubsection{Results and Ablation Study}
+The proposed framework achieved strong results on both benchmark datasets (MELD and IEMOCAP). DistilBERT reached 81\% weighted F1 for emotion and 77\% for sentiment on MELD, and 77\%/79\% on IEMOCAP. MobileBERT scored lower overall but remained competitive given its much smaller footprint, making it the better fit for truly resource-constrained deployments.
+The ablation study broke down how much each component contributed. Removing the prototypical networks caused the steepest performance drop, 15 to 18 percentage points, confirming they are the backbone of the approach, particularly for handling imbalanced classes. Dropping the focal weighted loss cost around 4 to 5 points, showing it plays a meaningful but secondary role. Data augmentation via random word deletion had the smallest impact, trimming only about 3 points when removed, though it still provided consistent gains across the board.
+
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{citations/references}
+
+\end{document}
