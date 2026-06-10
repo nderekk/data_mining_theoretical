@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.11)  31 MAY 2026 15:02
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.11)  10 JUN 2026 03:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -991,7 +991,7 @@ LaTeX Info: Redefining \omega on input line 55.
 \openout2 = `titlepage.aux'.
 
  (./titlepage.tex
-<img/upatras.jpg, id=333, 199.7061pt x 199.7061pt>
+<img/upatras.jpg, id=329, 199.7061pt x 199.7061pt>
 File: img/upatras.jpg Graphic file (type jpg)
 <use img/upatras.jpg>
 Package pdftex.def Info: img/upatras.jpg  used on input line 9.
@@ -1052,7 +1052,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [4
 
 ]
-<img/transformer_architecture_high.png, id=459, 758.835pt x 475.7775pt>
+<img/transformer_architecture_high.png, id=454, 758.835pt x 475.7775pt>
 File: img/transformer_architecture_high.png Graphic file (type png)
 <use img/transformer_architecture_high.png>
 Package pdftex.def Info: img/transformer_architecture_high.png  used on input line 90.
@@ -1067,7 +1067,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [5]
-<img/xray_encoder.png, id=466, 1222.5675pt x 795.97375pt>
+<img/xray_encoder.png, id=461, 1222.5675pt x 795.97375pt>
 File: img/xray_encoder.png Graphic file (type png)
 <use img/xray_encoder.png>
 Package pdftex.def Info: img/xray_encoder.png  used on input line 99.
@@ -1092,7 +1092,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has
                                                   \__shipout_drop_firstpage_...
 l.107 
        <./img/transformer_architecture_high.png> <./img/xray_encoder.png>]
-<img/enc_dec_layers.png, id=476, 882.29625pt x 280.04625pt>
+<img/enc_dec_layers.png, id=471, 882.29625pt x 280.04625pt>
 File: img/enc_dec_layers.png Graphic file (type png)
 <use img/enc_dec_layers.png>
 Package pdftex.def Info: img/enc_dec_layers.png  used on input line 110.
@@ -1121,12 +1121,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [8]
-<img/Wo.png, id=492, 1377.145pt x 761.84625pt>
+<img/Wo.png, id=487, 1377.145pt x 761.84625pt>
 File: img/Wo.png Graphic file (type png)
 <use img/Wo.png>
 Package pdftex.def Info: img/Wo.png  used on input line 145.
 (pdftex.def)             Requested size: 385.02547pt x 212.98999pt.
-<img/multihead.png, id=493, 1441.385pt x 807.015pt>
+<img/multihead.png, id=488, 1441.385pt x 807.015pt>
 File: img/multihead.png Graphic file (type png)
 <use img/multihead.png>
 Package pdftex.def Info: img/multihead.png  used on input line 153.
@@ -1141,7 +1141,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [9 <./img/Wo.png> <./img/multihead.png>]
-<img/encdev_attention.png, id=501, 1443.3925pt x 792.9625pt>
+<img/encdev_attention.png, id=495, 1443.3925pt x 792.9625pt>
 File: img/encdev_attention.png Graphic file (type png)
 <use img/encdev_attention.png>
 Package pdftex.def Info: img/encdev_attention.png  used on input line 166.
@@ -1179,11 +1179,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [12]
-Overfull \hbox (0.87662pt too wide) in paragraph at lines 208--209
-[]\OT1/cmr/bx/n/12 ULM-FiT\OT1/cmr/m/n/12 : Trans-fer learn-ing meth-ods to ef-fec-tively itiziled what the mod-els learned
- []
-
-
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1197,7 +1192,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 223--225
 
  []
 
-<img/BERT_input_output.png, id=522, 598.235pt x 371.3875pt>
+<img/BERT_input_output.png, id=517, 598.235pt x 371.3875pt>
 File: img/BERT_input_output.png Graphic file (type png)
 <use img/BERT_input_output.png>
 Package pdftex.def Info: img/BERT_input_output.png  used on input line 228.
@@ -1217,7 +1212,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has
                                                   \__shipout_drop_firstpage_...
 l.237 
        <./img/BERT_input_output.png>]
-<img/BERT_pre_training.png, id=530, 455.7025pt x 510.90875pt>
+<img/BERT_pre_training.png, id=525, 455.7025pt x 510.90875pt>
 File: img/BERT_pre_training.png Graphic file (type png)
 <use img/BERT_pre_training.png>
 Package pdftex.def Info: img/BERT_pre_training.png  used on input line 240.
@@ -1237,12 +1232,12 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has
                                                   \__shipout_drop_firstpage_...
 l.251     \item \textbf
                        {Question Answering Tasks} <./img/BERT_pre_training.png>]
-<img/BERT_fine_tuning.png, id=538, 455.7025pt x 510.90875pt>
+<img/BERT_fine_tuning.png, id=533, 455.7025pt x 510.90875pt>
 File: img/BERT_fine_tuning.png Graphic file (type png)
 <use img/BERT_fine_tuning.png>
 Package pdftex.def Info: img/BERT_fine_tuning.png  used on input line 257.
 (pdftex.def)             Requested size: 385.02547pt x 431.67848pt.
-<img/BERT_downstream_tasks.png, id=539, 645.41125pt x 623.32875pt>
+<img/BERT_downstream_tasks.png, id=534, 645.41125pt x 623.32875pt>
 File: img/BERT_downstream_tasks.png Graphic file (type png)
 <use img/BERT_downstream_tasks.png>
 Package pdftex.def Info: img/BERT_downstream_tasks.png  used on input line 264.
@@ -1342,7 +1337,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has 
                                                   \__shipout_drop_firstpage_...
 l.377 
       ]
-<img/acc.png, id=583, 575.14874pt x 711.65875pt>
+<img/acc.png, id=578, 575.14874pt x 711.65875pt>
 File: img/acc.png Graphic file (type png)
 <use img/acc.png>
 Package pdftex.def Info: img/acc.png  used on input line 385.
@@ -1429,7 +1424,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [26
 
 ]
-<img/rex_cleaning_pipeline.png, id=619, 601.24625pt x 281.05pt>
+<img/rex_cleaning_pipeline.png, id=614, 601.24625pt x 281.05pt>
 File: img/rex_cleaning_pipeline.png Graphic file (type png)
 <use img/rex_cleaning_pipeline.png>
 Package pdftex.def Info: img/rex_cleaning_pipeline.png  used on input line 471.
@@ -1509,7 +1504,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [32]
-<img/ABSA_tasks.png, id=656, 589.20125pt x 343.2825pt>
+<img/ABSA_tasks.png, id=651, 589.20125pt x 343.2825pt>
 File: img/ABSA_tasks.png Graphic file (type png)
 <use img/ABSA_tasks.png>
 Package pdftex.def Info: img/ABSA_tasks.png  used on input line 572.
@@ -1542,7 +1537,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) ha
                                                   \__shipout_drop_firstpage_...
 l.587     \item T
                  he mutually beneficial relationships between tasks can enha... <./img/ABSA_tasks.png>]
-<img/SMABSA_sentence_examples.png, id=672, 589.20125pt x 122.4575pt>
+<img/SMABSA_sentence_examples.png, id=667, 589.20125pt x 122.4575pt>
 File: img/SMABSA_sentence_examples.png Graphic file (type png)
 <use img/SMABSA_sentence_examples.png>
 Package pdftex.def Info: img/SMABSA_sentence_examples.png  used on input line 602.
@@ -1557,7 +1552,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [35]
-<img/SMABSA_architecture.png, id=679, 589.20125pt x 486.81876pt>
+<img/SMABSA_architecture.png, id=674, 589.20125pt x 486.81876pt>
 File: img/SMABSA_architecture.png Graphic file (type png)
 <use img/SMABSA_architecture.png>
 Package pdftex.def Info: img/SMABSA_architecture.png  used on input line 612.
@@ -1623,7 +1618,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [40]
-<img/DAPT_framework.png, id=720, 750.805pt x 455.7025pt>
+<img/DAPT_framework.png, id=715, 750.805pt x 455.7025pt>
 File: img/DAPT_framework.png Graphic file (type png)
 <use img/DAPT_framework.png>
 Package pdftex.def Info: img/DAPT_framework.png  used on input line 713.
@@ -1743,7 +1738,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [51]
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 989.
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 986.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
@@ -1755,11 +1750,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[52]
-<img/SB_MoE_Architecture.png, id=795, 774.895pt x 278.03876pt>
+[52{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc}]
+<img/SB_MoE_Architecture.png, id=791, 774.895pt x 278.03876pt>
 File: img/SB_MoE_Architecture.png Graphic file (type png)
 <use img/SB_MoE_Architecture.png>
-Package pdftex.def Info: img/SB_MoE_Architecture.png  used on input line 996.
+Package pdftex.def Info: img/SB_MoE_Architecture.png  used on input line 993.
 (pdftex.def)             Requested size: 452.9679pt x 162.5311pt.
 
 
@@ -1770,11 +1765,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[53{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc}
+[53
 pdfTeX warning (ext4): destination with the same identifier (name{figure.14}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1005 
+l.1002 
         <./img/SB_MoE_Architecture.png>]
 
 
@@ -1823,7 +1818,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [58]
-runsystem(latexminted cleantemp  --timestamp 20260531150201 FAD58DE7366495DB4650CFEFAC2FCD61)...executed safely (allowed).
+runsystem(latexminted cleantemp  --timestamp 20260610033430 FAD58DE7366495DB4650CFEFAC2FCD61)...executed safely (allowed).
 
  (./main.aux (./titlepage.aux))
  ***********
@@ -1835,21 +1830,21 @@ L3 programming layer <2025-01-18>
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 01A960F660C3465C4978DA7ABD1C6CD1;19456.
+(rerunfilecheck)             Checksum: 77093C2545ECE32D5B59ED3E12F02967;19232.
  ) 
 Here is how much of TeX's memory you used:
- 20924 strings out of 473190
- 388538 string characters out of 5715800
+ 20921 strings out of 473190
+ 388490 string characters out of 5715800
  903760 words of memory out of 5000000
- 43686 multiletter control sequences out of 15000+600000
+ 43684 multiletter control sequences out of 15000+600000
  568642 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,955b,638s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,956b,638s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cbfonts/grmn1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cbfonts/grmn1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb>
-Output written on main.pdf (59 pages, 3279996 bytes).
+Output written on main.pdf (59 pages, 3280179 bytes).
 PDF statistics:
- 951 PDF objects out of 1000 (max. 8388607)
- 812 compressed objects within 9 object streams
- 221 named destinations out of 1000 (max. 500000)
- 747 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 946 PDF objects out of 1000 (max. 8388607)
+ 807 compressed objects within 9 object streams
+ 220 named destinations out of 1000 (max. 500000)
+ 739 words of extra memory for PDF output out of 10000 (max. 10000000)
 

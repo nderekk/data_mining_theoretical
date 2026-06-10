@@ -1,15 +1,15 @@
 # Fdb version 4
-["bibtex main"] 1780228921.71755 "main.aux" "main.bbl" "main" 1780228925.69661 0
+["bibtex main"] 1781050883.78315 "main.aux" "main.bbl" "main" 1781051674.74837 0
   "./citations/references.bib" 1780140333.76999 3549 8344a87f6c5bd043c1038c59f378af4e ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/natbib/plainnat.bst" 1233624470 26816 ffe5423d2019860bad9f54bc402fac15 ""
-  "main.aux" 1780228925.29935 17873 0288b7554bfb85aad03e1f3e479b18d5 "pdflatex"
-  "titlepage.aux" 1780228922.92259 1157 faec3fb56da2cdda68f654277cc251e2 "pdflatex"
+  "main.aux" 1781051674.30801 17733 f11c96c876ed98adbd98e98bf69d098e "pdflatex"
+  "titlepage.aux" 1781051671.57584 1157 faec3fb56da2cdda68f654277cc251e2 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1780228921.85771 "/Users/vaggelismitrogiannis/Desktop/data_mining_theoretical/main.tex" "main.pdf" "main" 1780228925.69704 0
-  "/Users/vaggelismitrogiannis/Desktop/data_mining_theoretical/main.tex" 1780228917.49679 101417 6e9e100cc2011c27ddd404576e481f11 ""
+["pdflatex"] 1781051670.38584 "/Users/vaggelismitrogiannis/Desktop/data_mining_theoretical/main.tex" "main.pdf" "main" 1781051674.74885 0
+  "/Users/vaggelismitrogiannis/Desktop/data_mining_theoretical/main.tex" 1781051669.9421 101339 2cc5f3eca187c28ddc6129762e020a29 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -168,12 +168,12 @@
   "img/transformer_architecture_high.png" 1780140333.9728 34778 5a7e5477e4c10d2f79baffbd41c8c871 ""
   "img/upatras.jpg" 1780140333.97328 117065 11f22aeaa390e6cebb063b168f619a3c ""
   "img/xray_encoder.png" 1780140333.97375 123708 0751052c18ca81c411a39c609cac2758 ""
-  "main.aux" 1780228925.29935 17873 0288b7554bfb85aad03e1f3e479b18d5 "pdflatex"
-  "main.bbl" 1780228921.84126 4009 f1917431ca8137fc913c81bca23b65b0 "bibtex main"
-  "main.out" 1780228925.30319 19456 01a960f660c3465c4978da7abd1c6cd1 "pdflatex"
-  "main.tex" 1780228917.49679 101417 6e9e100cc2011c27ddd404576e481f11 ""
-  "main.toc" 1780228925.30397 8617 8f14bd1ad1288fc8a731ff373b57470d "pdflatex"
-  "titlepage.aux" 1780228922.92259 1157 faec3fb56da2cdda68f654277cc251e2 "pdflatex"
+  "main.aux" 1781051674.30801 17733 f11c96c876ed98adbd98e98bf69d098e "pdflatex"
+  "main.bbl" 1781050883.90064 4009 f1917431ca8137fc913c81bca23b65b0 "bibtex main"
+  "main.out" 1781051674.31132 19232 77093c2545ece32d5b59ed3e12f02967 "pdflatex"
+  "main.tex" 1781051669.9421 101339 2cc5f3eca187c28ddc6129762e020a29 ""
+  "main.toc" 1781051674.31194 8518 f7dc9a31c3d33ca2c2b58f476f47f64b "pdflatex"
+  "titlepage.aux" 1781051671.57584 1157 faec3fb56da2cdda68f654277cc251e2 "pdflatex"
   "titlepage.tex" 1780140333.99181 719 daddcf1067dd647e50739de2245d915a ""
   (generated)
   "main.aux"

@@ -205,7 +205,7 @@ Before we dive deeper in the architecture behind BERT, let's see a number of cle
 \begin{itemize}
     \item \textbf{Transformer}: A rebellious idea in the NLP world, that replaced the heavily-used LSTM architecture. The consistency of its 2 major parts, the Encoder and the Decoder, alongside with the embedded groundbreaking Attention mechanism, resulted in a never-seen before experimental evaluation.
     \item \textbf{ELMo}: ELMo (Embeddings for Language Models) provided a significant step towards pre-training in the context of NLP, as it introduced both the contextualized embedding for each word and the bi-directional 'scanning' for finding context.
-    \item \textbf{ULM-FiT}: Transfer learning methods to effectively itiziled what the models learned during pre-training, in order to fine-tune language models for various tasks.
+    \item \textbf{ULM-FiT}: Transfer learning methods to effectively utilize what the models learned during pre-training, in order to fine-tune language models for various tasks.
     \item \textbf{OpenAI Transformer}: By using only the Decoder of the Transformer architecture and masking future tokens to predict next words, it handles various downstream tasks.
 \end{itemize}
 
@@ -543,7 +543,7 @@ The presented paper contributes the following:
 Aspect-Based Sentiment Analysis}
 
 \subsection{Review Analysis in the E-Commerce Era}
-The majority of communication between merchants and clients online happens throguh reviews and product feedbacks. For the merchant, it is completely and utterly important to carefully read and analyze the response to what he has been producing. However, the huge amounts of reviews on the internet turn this procedure on something that takes huge amounts of time, so we turn on the need for something automized. Even though sentenc-level sentiment analysis 
+The majority of communication between merchants and clients online happens through reviews and product feedbacks. For the merchant, it is completely and utterly important to carefully read and analyze the response to what he has been producing. However, the huge amounts of reviews on the internet turn this procedure on something that takes huge amounts of time, so we turn on the need for something automized. Even though sentence-level sentiment analysis 
 might seem to be a good fit, it oversees how the real client reacts to a product and that is by focusing on its aspects (e.g. color,price,etc.). That is why researches approached the problem with \textbf{Aspect-Based Sentiment Analysis (ABSA)}, a more aspect-focused approach on classifying a text's sentiment by giving more weight to the 'protagonistic' entities. Alongside this, researches also turn their focus on \textbf{Subjectivity Detection (SD)}. 
 We care more for subjective than objective opinions, as by filtering out the objective ones, which by the way can be classified of 'Neural' sentiment, the model assigns fine-grained sentiments only on subjective aspects, thus avoiding its 'confusion' and reducing false positives in sentiment classification. By exploiting multitask learning, this approach tends to prove the generalization achieved by the combination of the 2 tasks and the remarkable 
 state-of-the-art results they achieve. The key contributions, as mentioned on the paper, are:
@@ -558,7 +558,7 @@ state-of-the-art results they achieve. The key contributions, as mentioned on th
 Before we dive deeper into the framework's architecture, we are going to analyze it's key components, both conceptually and technically.
 \subsubsection{Aspect-Based Sentiment Analysis (ABSA)}
 When we talk about Aspect-Based Sentiment Analysis (ABSA), we want to understand what are the emotions linked to product features or attributes in a document (text,review,etc.). Moreover, we want to realise the impact that these emotions have in the entire document's polarity, which can be positive, neutral or negative. Even though it sounds simple, the challenge to the sentiment classification task arrives when we want to realise how the semantic associations 
-develop between the main aspect feature of the sentence and its surrounding contextual elements. Previous papers have a defined the key elements for conducting an ABSA research. These are \textbf{Aspect term a}, which is the target of opinion, \textbf{Aspect opinion o}, which is the classification of target, \textbf{Opinion term o}, the sentiment conveying to the opinion about the target and \textbf{Sentiment Polarity p}, the emotional attitude linked to an aspect termm.They also define a series 'textbook' ABSA tasks, which we call single ABSA tasks, and their combinations, the compound ABSA tasks. These are:
+develop between the main aspect feature of the sentence and its surrounding contextual elements. Previous papers have defined the key elements for conducting an ABSA research. These are \textbf{Aspect term a}, which is the target of opinion, \textbf{Aspect opinion o}, which is the classification of target, \textbf{Opinion term o}, the sentiment conveying to the opinion about the target and \textbf{Sentiment Polarity p}, the emotional attitude linked to an aspect term.They also define a series 'textbook' ABSA tasks, which we call single ABSA tasks, and their combinations, the compound ABSA tasks. These are:
 
 \begin{enumerate}
     \item \textbf{Aspect Term Extraction (ATE)}
@@ -604,7 +604,7 @@ Before we analyze the architecture of \textbf{Subjectivity Multitask Aspect-base
 \end{figure}
 
 \subsubsection{General Architecture Overview}
-The proposed Multitask Learning Approach is built upon a BERT Embeddings Layer, which shares results to 2 Bi-LSTM networks, one for each task. After both forward and backward contextual dependencies of tokens are captured, a self-attention mechanism follows to highlight the relevant words of input sequence for classification. The weighted results of the self-attention mechanism are fed into a Neurl Tensor Network, which  captures the complex interactions between the task-specific representations and finally, its ouputs are passed in a classifcation mechanism for the inal decisions to be extracted. You can see a generalized schema of the architecture in the image below, followed by a more spoecialised 
+The proposed Multitask Learning Approach is built upon a BERT Embeddings Layer, which shares results to 2 Bi-LSTM networks, one for each task. After both forward and backward contextual dependencies of tokens are captured, a self-attention mechanism follows to highlight the relevant words of input sequence for classification. The weighted results of the self-attention mechanism are fed into a Neural Tensor Network, which  captures the complex interactions between the task-specific representations and finally, its ouputs are passed in a classifcation mechanism for the final decisions to be extracted. You can see a generalized schema of the architecture in the image below, followed by a more specialised 
 and analytical view on each of the framework's component.
 
 \begin{figure}[h!]
@@ -614,7 +614,7 @@ and analytical view on each of the framework's component.
 \end{figure}
 
 \subsubsection{Shared Embedding Layer \& Bi-LSTM Networks}
-The first step is the passing of our input, that is the sentence and aspect terms, into a shared embedding layer. The input is tokenized using WordPiece Tokenizer and then forwarded into the BERT Encoder. In that way, contextualized embeddings are generated for each token in the sequence. The output is a sequence of tokens ($H=\{h_0,h_1,...,h_n\}$), where h\_i is the hidden output of the BERT model in the i-th position. The BERT version used in this framework is BERT Base, which may not have the same number of parameters as BERT Large, it is much more computationally efficient. The BERT Encoder's Layers are fed into 2 Bi-Directional Long Short-Term Memory (LSTM) Modules, one for each task, which decompose H and learn the context-rich task-specific representations for the 2 subtasks. The following forward and backward contextual dependencies are enabled:
+The first step is the passing of our input, that is the sentence and aspect terms, into a shared embedding layer. The input is tokenized using WordPiece Tokenizer and then forwarded into the BERT Encoder. In that way, contextualized embeddings are generated for each token in the sequence. The output is a sequence of tokens ($H=\{h_0,h_1,...,h_n\}$), where $h_i$ is the hidden output of the BERT model in the i-th position. The BERT version used in this framework is BERT Base, which may not have the same number of parameters as BERT Large, it is much more computationally efficient. The BERT Encoder's Layers are fed into 2 Bi-Directional Long Short-Term Memory (LSTM) Modules, one for each task, which decompose H and learn the context-rich task-specific representations for the 2 subtasks. The following forward and backward contextual dependencies are enabled:
 \begin{align}
 h_t^{\text{forward}} &= \mathrm{LSTM}_{\text{forward}}(h_t, h_{t-1}^{\text{forward}}) \\
 h_t^{\text{backward}} &= \mathrm{LSTM}_{\text{backward}}(h_t, h_{t+1}^{\text{backward}}) \\
@@ -726,7 +726,7 @@ In order for our language models to process the newly created corpus, we need to
 and for \textbf{ALBERT} we are using the \textbf{SentencePiece} Tokenizer. Also, special tokens, such as [CLS] for Classification or [MASK] for masking tokens, were added according to the requirements of the MLMs.
 
 \subsubsection{Sequence processing and Categorization for batch construction}
-Another problem that needs to be faces is variable input length, as the self-attention operation used in transformer-based models seems to not scale on an efficient rate. This problem is present in our newly created corpus, which seems to be highly heterogenous in the matter of length. An upper token limit set to 512 was set to for our standard width context window size in BERT and ALBERT and for texts exceeding this limit, 
+Another problem that needs to be faced is variable input length, as the self-attention operation used in transformer-based models seems to not scale on an efficient rate. This problem is present in our newly created corpus, which seems to be highly heterogenous in the matter of length. An upper token limit set to 512 was set to for our standard width context window size in BERT and ALBERT and for texts exceeding this limit, 
 overlapping chunking strategy was implemented with a predefined stride parameter. Last but not least, for computational efficiency, the sequences were categorized in diferrent buckets/batches, according to the token length. Inside each bucket, all the tokens were padded to the length of the longest sequence, saving both memory and facing the variable lenght input problem. Before training, the batches are randomly shuffled to ensure diversity,
 keeping in the same times the efficient memory management.
 
@@ -749,7 +749,7 @@ This approach ensures that when random shuffling the batches before training, al
 As previously metioned, this study takes already pre-trained language models, which are BERT and ALBERT, and 'force' them in another round of pre-training on a specific field to specify the model's fit to it. This procedure, also known as \textbf{Domain-Adapative PreTraining (DAPT)}, is believed to improve results in downstream tasks, such as increased contextuality on the new field. In this section, 2 basic topics of DAPT are analyzed: \textbf{MLM} and \textbf{Domain-Adapated Model Evaluation}.
 
 \subsubsection{Masked Language Modeling (MLM)}
-Even though it was first suggested that the pre-training of BERT models should consist of 2 part, masking and Next Sentence Prediction (NSP), only masking is used in this study due to the proven inefficiency of NSP. There are 5 stages in which the BERT and ALBERT models go thorugh DAPT:
+Even though it was first suggested that the pre-training of BERT models should consist of 2 parts, masking and Next Sentence Prediction (NSP), only masking is used in this study due to the proven inefficiency of NSP. There are 5 stages in which the BERT and ALBERT models go thorugh DAPT:
 
 \begin{enumerate}
     \item \textbf{Data Preparation}: As analyzed in the previous section.
@@ -768,7 +768,7 @@ L_{\text{MLM}} = - \sum \log P(w_i \mid \tilde{w})
  , where $w_i$ is the correct token at masked position i and $\tilde{w}$ is sequence with masked tokens. The function is minimized using the AdamW optimizer with weight decay and learning rate.
 
 \subsubsection{Domain-Adapted Model Evaluation}
-In this study, both Intrinsic and Extrinsinc Model Evaluation Metrics are used. For \textbf{Intrinsic Evaluation}, Pseudo-Perplexity is a meaningful metric for BERT evaluation. Let $W=(w_1,w_2,...,w_n)$ be a sequence of tokens. The \textbf{pseudo-log-likelihood (PLL)} is defined as:
+In this study, both Intrinsic and Extrinsic Model Evaluation Metrics are used. For \textbf{Intrinsic Evaluation}, Pseudo-Perplexity is a meaningful metric for BERT evaluation. Let $W=(w_1,w_2,...,w_n)$ be a sequence of tokens. The \textbf{pseudo-log-likelihood (PLL)} is defined as:
 
 \begin{align}
 \text{PLL}(W) = \sum_{t=1}^{|W|} \log P(w_t \mid W_{\setminus t}; \theta)
@@ -786,7 +786,7 @@ Finally, for fair comparison between models with different subword tokenization 
 \text{PPPL}_w(W) = \exp\left( -\frac{1}{N_w} \cdot \text{PLL}(W) \right)
 \end{align}
 
-For \textbf{Extrisinc Evaluation}, as task-specific classification will be added in the fine-tuning section, we use the \textbf{Weighted F1 Score}, as it effectively balances the precision-recall trade off.
+For \textbf{Extrinsic Evaluation}, as task-specific classification will be added in the fine-tuning section, we use the \textbf{Weighted F1 Score}, as it effectively balances the precision-recall trade off.
 
 \subsection{Downstream Domain-Specific Fine-Tuning}
 Now that the language models have passed another phase of pre-training, the domain-adapted one, it is time to evaluate that procedure on downstream domain-specific classification tasks. The evaluation happens by mainly comparing the models before and after DAPT and against other diverse baseline models. The fine-tuning phase consists of the \textbf{Corpus Development},
@@ -967,27 +967,24 @@ three mechanisms govern forgetting in encoder-only models like BERT remains an o
 question, and extending this mechanistic framework to encoders represents a natural
 direction for future work.
 
-\subsection{Encoder Architecture: ModernBERT}
-% TODO: Write ModernBERT content here
-
 \subsection{Mixture of Experts Approaches in Dense Retrieval Tasks}
 As it is known, the primary goal of Information Retrieval is to efficiently identify, rank and deliver the most relevant information from a large collection of data in response to a user's query. In the past, Sparse Retrieval Models (sparse-lexicon models) were used as a solution to IR's goal. Even though the keyword matching technique that SRMs supported between the user's query and the document
 made sense at first, its big gap was that such models were missing the semantic similarity between words or phrases. For example, if a user would search for 'fast electric car' documents including exactly these words would be returned. However, documents containing informations about 'speedy EV', which semantically refer to the same topic as the user's query, would be missed. For that reason, Dense Retrieval
-Models (DRMs) were proposed. DRMs are based on the Transformer model, and more specifically on BERT, therefore allowing the networks to capture semantic meaning between query and document. DRMs map both queries and documents into the embedding space, where semantic similarity equals to geometric closenes and for that reason a similarity score is finally employed to assess the resemblance between query and document.
-A big problem that DRMs faced was generalization, as they perfrom really well on specific tasks they are fine tuned to but lack the ability of generalizing on larger domains. The authors propose a framework by employing a single block Mixrure-of-Experts (SB-MoE) right after the final Transformer layer of the underlying DRMs. 
+Models (DRMs) were proposed. DRMs are based on the Transformer model, and more specifically on BERT, therefore allowing the networks to capture semantic meaning between query and document. DRMs map both queries and documents into the embedding space, where semantic similarity equals to geometric closeness and for that reason a similarity score is finally employed to assess the resemblance between query and document.
+A big problem that DRMs faced was generalization, as they perform really well on specific tasks they are fine tuned to but lack the ability of generalizing on larger domains. The authors propose a framework by employing a single block Mixrure-of-Experts (SB-MoE) right after the final Transformer layer of the underlying DRMs. 
 
 \subsubsection{Mixture-of-Experts Block}
-The SB-MoE added after the DRMs consists of multiple pairs of Feed-Forward Networks (FFNs), where each one is specialized in somehting diferrent than the others (that's why they are called 'experts'). After an input, a gating function (neural network which assigns a weight to each expert) determines how relevant each expert is to the input and along a pooling strategy, the final prediction of the model.
+The SB-MoE added after the DRMs consists of multiple pairs of Feed-Forward Networks (FFNs), where each one is specialized in something different than the others (that's why they are called 'experts'). After an input, a gating function (neural network which assigns a weight to each expert) determines how relevant each expert is to the input and along a pooling strategy, the final prediction of the model.
 
 \subsubsection{Architecture}
 SB-MOE builds on a standard bi-encoder architecture, where one of four underlying base models — Contriever (110M parameters), BERT-Base (110M), BERT-Small (29M), or TinyBERT (14.5M) — independently encodes the query and document into dense vector embeddings. 
 The SB-MoE is then appended after the final Transformer layer of whichever base model is used, acting on both the query and document embeddings simultaneously . The gating function, consisting of a single hidden layer that halves the vector dimension followed by an output layer
 sized to the number of experts, is trained end-to-end in an unsupervised manner alongside the underlying DRM and the experts themselves. Each expert follows the adapter architecture, with a down-projection layer that halves the input dimension and an up-projection that restores it, plus a skip connection for residual learning. At inference time, the model operates in one of two modes:
-$SB-MOE_TOP-1$, which selects only the expert assigned the highest gating score, or $SB-MOE_ALL$, which produces a weighted sum across all experts. The final enriched embeddings from either variant are then compared via dot product to compute query-document relevance scores. The authors look to answer in the 3 following Research Questions (RQs) to evaluate their framework:
+$SB-MOE_{TOP-1}$, which selects only the expert assigned the highest gating score, or $SB-MOE_{ALL}$, which produces a weighted sum across all experts. The final enriched embeddings from either variant are then compared via dot product to compute query-document relevance scores. The authors look to answer in the 3 following Research Questions (RQs) to evaluate their framework:
 
 \begin{itemize}
     \item{\textbf{RQ1}}: How does SB-MOE compare, in terms of retrieval effectiveness, to the fine-tuned version of the underlying DRM? - The authors fine-tune each DRM as baseline experiments to compare to their model including SB-MoE (\textbf{\texttt{FINE-TUNED}}).
-    \item{\textbf{RQ2}}: To what extent can the observed performance gains be attributed to the learned gating function and to the experts’ ability to capture useful textual characteristics? - The authors employ enother baseline where they assign random weights to the gating function (\textbf{\texttt{RANDOM-GATE}}). 
+    \item{\textbf{RQ2}}: To what extend can the observed performance gains be attributed to the learned gating function and to the experts’ ability to capture useful textual characteristics? - The authors employ enother baseline where they assign random weights to the gating function (\textbf{\texttt{RANDOM-GATE}}). 
     \item{\textbf{RQ3}}: Can SB-MOE generalize well across multiple domains and tasks without additional fine-tuning? - The authors fine-tune all 4 DRMs on the MSMARCO dataset, which is widely adopted for zero-shot evaluation.
 \end{itemize}
 
@@ -1017,9 +1014,9 @@ The pipeline's architecture follows some finite steps that allows the model to p
     \item {\textbf{Data Augmentation}}: Data Augmentation is applied through random word deletion to introduce variability into training data, therefore enhancing model generalization and robustness.
     \item {\textbf{Lightweight Transformer Models}}: The next step focuses on our data being passed through MobileBERT and DistilBERT. Both models have a tradeoff between hitting high metric scores and parameter number. As we are going to discuss in the results section below, DistilBERT supposedly has better results compared to MobileBERT due to higher paramemter count and therefore higher computational intensity and MobileBERT hits more modest results, 
         but with much higher efficiency on realtime inference, which makes it more suitable for deployment as an edge device (e.g. mobile phone).
-    \item{\textbf{Prototypical Networks}}: Protoypical Networks are used for metric-based classification for few-shot tasks. They work by computing a center for each class in the embedding space and when it is time to classify an item, in our case an utterance, the eulidean distance between the utterance and the prototypes center is being computed. Of course, the class with the smaller distance is selected for prediction. This approach is robust for class-imbalanced datasets as
+    \item{\textbf{Prototypical Networks}}: Protoypical Networks are used for metric-based classification for few-shot tasks. They work by computing a center for each class in the embedding space and when it is time to classify an item, in our case an utterance, the euclidean distance between the utterance and the prototypes center is being computed. Of course, the class with the smaller distance is selected for prediction. This approach is robust for class-imbalanced datasets as
         prototypes adapt dynamically to the class distribution and ensure discriminative embeddings. The formula used to compute Protoypical Network loss is $L_{\mathrm{proto}} = \frac{1}{N} \sum_{i=1}^{N} d\!\left(f(x_i), \mu_{y_i}\right)$ and it ensures the tight clustering of the utterance embeddings around around the class prototypes.
-    \item{\textbf{Focal Weighted Loss Function}}: In another attempt to mitigate the class imbalance in the dataset, the focal weighted loss function is introduced. It introduces a modulating factor that adjusts depending on the difficulty of prediction for each class. It is computed using the formula $FL(p_t) = -\alpha_t (1 - p_t)^{\gamma} \log(p_t)$, where p\_t is the model's predicted probability for the correct class, a\_t is a weight assigned to a class t depending on the class' difficulty to be predicted
+    \item{\textbf{Focal Weighted Loss Function}}: In another attempt to mitigate the class imbalance in the dataset, the focal weighted loss function is introduced. It introduces a modulating factor that adjusts depending on the difficulty of prediction for each class. It is computed using the formula $FL(p_t) = -\alpha_t (1 - p_t)^{\gamma} \log(p_t)$, where $p_t$ is the model's predicted probability for the correct class, $a_t$ is a weight assigned to a class t depending on the class' difficulty to be predicted
         and γ is a modulating factor, so the model will learn to focus on more difficult-to-classify examples. The final loss function is a weighted combination od focal weighted loss and protoypical network loss functions for both tasks.
     \item{\textbf{Shared Layers and Task-Specific Layers}}: Last but not least, the pipeline employs shared layers for leveraging common patters and detecting shared relation between the 2 tasks and task-specific layers for each task specifically. The former consists of transformer layers from our lightweight transformer models, while the latter of fully connected layers. Finally, Multi-Head attention is used to help the model focus better on emotinally-heavy part of a sentence, while cross-attention helps enabling
         the interaction between the two tasks.
