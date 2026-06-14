@@ -1,4 +1,4 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{11}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -49,6 +49,11 @@ Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N
 Benjamin Warner, Antoine Chaffin, Benjamin Clavi{\'e}, Orion Weller, Oskar Hallstr{\"o}m, Said Taghadouini, Alexis Gallagher, Raja Biswas, Faisal Ladhak, Tom Aarsen, et~al.
 \newblock Smarter, better, faster, longer: A modern bidirectional encoder for fast, memory efficient, and long context finetuning and inference.
 \newblock In \emph{Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)}, pages 2526--2547, 2025.
+
+\bibitem[Weller et~al.(2025)Weller, Ricci, Marone, Chaffin, Lawrie, and Van~Durme]{weller2025seq}
+Orion Weller, Kathryn Ricci, Marc Marone, Antoine Chaffin, Dawn Lawrie, and Benjamin Van~Durme.
+\newblock Seq vs seq: An open suite of paired encoders and decoders.
+\newblock \emph{arXiv preprint arXiv:2507.11412}, 2025.
 
 \bibitem[Zhao et~al.(2025)Zhao, Kang, Sun, Xi, Shen, Gao, and Wang]{zhao2025aspect}
 Chuanjun Zhao, Lu~Kang, Xuzhuang Sun, Xiaoxiong Xi, Lihua Shen, Jing Gao, and Yanjie Wang.
